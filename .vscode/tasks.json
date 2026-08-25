@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "OpenCode",
+      "type": "shell",
+      "command": "opencode",
+      "problemMatcher": [],
+      "presentation": {
+        "focus": true,
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "OpenCode (new terminal)",
+      "type": "shell",
+      "command": "opencode",
+      "problemMatcher": [],
+      "presentation": {
+        "focus": true,
+        "reveal": "always",
+        "clear": true
+      }
+    }
+  ]
+}

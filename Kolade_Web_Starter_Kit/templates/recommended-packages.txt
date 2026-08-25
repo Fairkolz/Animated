@@ -1,0 +1,17 @@
+# Core
+next
+react
+react-dom
+
+# Styling
+tailwindcss
+
+# Motion
+motion
+gsap
+lenis
+
+# Optional advanced 3D
+# three
+# @react-three/fiber
+# @react-three/drei

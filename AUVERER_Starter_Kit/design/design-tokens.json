@@ -1,0 +1,17 @@
+{
+  "colors": {
+    "navy": "#0B1F3A",
+    "taupe": "#CFC3B3",
+    "cream": "#F6F3ED",
+    "charcoal": "#2F2A25"
+  },
+  "typography": {
+    "display": "Cormorant Garamond",
+    "body": "Inter"
+  },
+  "motion": {
+    "durationFast": 0.35,
+    "durationSlow": 1.2,
+    "ease": "power3.out"
+  }
+}

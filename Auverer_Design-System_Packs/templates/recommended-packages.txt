@@ -1,0 +1,23 @@
+# Typical project dependencies
+
+# Core
+next
+react
+react-dom
+
+# Styling
+tailwindcss
+
+# React/UI motion — formerly Framer Motion
+motion
+
+# Advanced animation
+gsap
+
+# Smooth scrolling
+lenis
+
+# Optional 3D/WebGL
+# three
+# @react-three/fiber
+# @react-three/drei

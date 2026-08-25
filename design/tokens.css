@@ -1,0 +1,87 @@
+:root {
+  /* Colors - Brand (hero world: deep charcoal / champagne gold / amber) */
+  --color-brand-primary: #0A0A0A;
+  --color-brand-secondary: #C9AE7E;
+  --color-brand-accent: #EFE9DD;
+  --color-accent-gold: #B79A63;
+
+  /* Colors - Surface */
+  --color-surface-background: #0A0A0A;
+  --color-surface-surface: #131211;
+  --color-surface-elevated: #1A1815;
+  --color-surface-dim: #060606;
+  --color-surface-container: #151311;
+  --color-surface-container-low: #0E0D0C;
+
+  /* Colors - Text */
+  --color-text-primary: #EFE9DD;
+  --color-text-secondary: #B9AF9F;
+  --color-text-muted: #877E70;
+  --color-text-inverse: #F6F3ED;
+
+  /* Colors - Border */
+  --color-border-default: #2A2723;
+  --color-border-strong: #4A4238;
+  
+  /* Colors - Status */
+  --color-status-success: #16794C;
+  --color-status-warning: #A66A00;
+  --color-status-error: #B42318;
+  --color-status-info: #175CD3;
+  
+  /* Typography */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'SF Mono', monospace;
+  
+  /* Spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-24: 6rem;
+  --spacing-32: 8rem;
+  
+  /* Layout */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+  --grid-columns: 12;
+  --grid-gap: 1.5rem;
+  
+  /* Radius — sharp-corner system (AUVERER-FULL-SITE-BRIEF.md §1.3).
+     0 everywhere; --radius-pill is reserved exclusively for filter/tag pills. */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-pill: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Motion */
+  --duration-fast: 0.35s;
+  --duration-normal: 0.5s;
+  --duration-slow: 1.2s;
+  --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+  
+  /* Breakpoints (for reference, used in media queries) */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}

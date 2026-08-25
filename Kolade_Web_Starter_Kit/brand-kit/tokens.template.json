@@ -1,0 +1,58 @@
+{
+  "brand": {
+    "primary": "#000000",
+    "secondary": "#FFFFFF",
+    "accent": "#000000"
+  },
+  "surface": {
+    "background": "#FFFFFF",
+    "surface": "#F7F7F7",
+    "elevated": "#FFFFFF"
+  },
+  "text": {
+    "primary": "#111111",
+    "secondary": "#666666",
+    "muted": "#888888",
+    "inverse": "#FFFFFF"
+  },
+  "border": {
+    "default": "#E5E5E5",
+    "strong": "#CCCCCC"
+  },
+  "status": {
+    "success": "#16794C",
+    "warning": "#A66A00",
+    "error": "#B42318",
+    "info": "#175CD3"
+  },
+  "typography": {
+    "display": "YOUR_DISPLAY_FONT",
+    "body": "YOUR_BODY_FONT",
+    "mono": "YOUR_MONO_FONT"
+  },
+  "spacing": {
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "12": "3rem",
+    "16": "4rem",
+    "24": "6rem",
+    "32": "8rem"
+  },
+  "radius": {
+    "sm": "0.375rem",
+    "md": "0.75rem",
+    "lg": "1.25rem",
+    "xl": "2rem",
+    "full": "9999px"
+  },
+  "motion": {
+    "fast": "180ms",
+    "normal": "350ms",
+    "slow": "700ms",
+    "easeStandard": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "figma": {
+    "colors": {
+      "brand/primary": "colors.brand.primary",
+      "brand/secondary": "colors.brand.secondary",
+      "brand/accent": "colors.brand.accent",
+      "surface/background": "colors.surface.background",
+      "surface/surface": "colors.surface.surface",
+      "surface/elevated": "colors.surface.elevated",
+      "text/primary": "colors.text.primary",
+      "text/secondary": "colors.text.secondary",
+      "text/muted": "colors.text.muted",
+      "text/inverse": "colors.text.inverse",
+      "border/default": "colors.border.default",
+      "border/strong": "colors.border.strong",
+      "status/success": "colors.status.success",
+      "status/warning": "colors.status.warning",
+      "status/error": "colors.status.error",
+      "status/info": "colors.status.info"
+    },
+    "typography": {
+      "display": "typography.display",
+      "body": "typography.body",
+      "mono": "typography.mono"
+    },
+    "spacing": {
+      "1": "spacing.1",
+      "2": "spacing.2",
+      "3": "spacing.3",
+      "4": "spacing.4",
+      "6": "spacing.6",
+      "8": "spacing.8",
+      "12": "spacing.12",
+      "16": "spacing.16",
+      "24": "spacing.24",
+      "32": "spacing.32"
+    },
+    "borderRadius": {
+      "sm": "radius.sm",
+      "md": "radius.md",
+      "lg": "radius.lg",
+      "xl": "radius.xl",
+      "pill": "radius.pill"
+    },
+    "shadows": {
+      "sm": "shadows.sm",
+      "md": "shadows.md",
+      "lg": "shadows.lg",
+      "xl": "shadows.xl"
+    }
+  }
+}

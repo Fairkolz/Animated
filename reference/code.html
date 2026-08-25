@@ -1,0 +1,488 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Auvérer | The Ritual of Radiance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#2f2a25",
+                      "background": "#fcf9f3",
+                      "surface-container-low": "#f6f3ed",
+                      "on-background": "#1c1c18",
+                      "on-tertiary-container": "#929295",
+                      "on-error": "#ffffff",
+                      "surface-container": "#f0eee8",
+                      "outline-variant": "#cfc5bc",
+                      "on-secondary-fixed-variant": "#594315",
+                      "accent-gold": "#B79A63",
+                      "background-secondary": "#D9CFC1",
+                      "surface-dim": "#dcdad4",
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#cec5bd",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#f3f0ea",
+                      "secondary-fixed": "#ffdea3",
+                      "inverse-surface": "#31312d",
+                      "surface-variant": "#e5e2dc",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed": "#1a1c1e",
+                      "on-secondary-fixed": "#261900",
+                      "on-error-container": "#93000a",
+                      "secondary": "#735b2a",
+                      "surface-container-high": "#ebe8e2",
+                      "surface-tint": "#645d57",
+                      "secondary-fixed-dim": "#e2c288",
+                      "primary": "#1a1611",
+                      "on-surface": "#1c1c18",
+                      "on-tertiary-fixed-variant": "#46474a",
+                      "surface-container-highest": "#e5e2dc",
+                      "tertiary-fixed-dim": "#c7c6ca",
+                      "background-primary": "#F6F3ED",
+                      "inverse-primary": "#cec5bd",
+                      "surface": "#fcf9f3",
+                      "tertiary-fixed": "#e3e2e6",
+                      "outline": "#7e766e",
+                      "tertiary": "#151719",
+                      "on-primary-container": "#99918a",
+                      "tertiary-container": "#2a2b2e",
+                      "text-charcoal": "#2F2A25",
+                      "on-primary-fixed": "#1f1b16",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#ebe1d9",
+                      "on-primary-fixed-variant": "#4c4640",
+                      "border-taupe": "#D9CFC1",
+                      "secondary-container": "#fddb9f",
+                      "surface-bright": "#fcf9f3",
+                      "on-surface-variant": "#4c463f",
+                      "on-secondary-container": "#775f2e",
+                      "error": "#ba1a1a",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "display": ["EB Garamond", "serif"],
+                      "headline": ["EB Garamond", "serif"],
+                      "body": ["Inter", "sans-serif"],
+                      "label": ["Inter", "sans-serif"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 800ms ease-out, transform 800ms ease-out;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .shimmer {
+            background: linear-gradient(90deg, rgba(183,154,99,0) 0%, rgba(183,154,99,0.2) 50%, rgba(183,154,99,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background selection:bg-accent-gold selection:text-white">
+<!-- Header Section -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<nav class="hidden lg:flex gap-6 uppercase text-[10px] tracking-[0.2em] font-semibold text-on-surface-variant">
+<a class="hover:text-accent-gold transition-colors" href="#">Collection</a>
+<a class="hover:text-accent-gold transition-colors" href="#">Manifesto</a>
+<a class="hover:text-accent-gold transition-colors" href="#">Journal</a>
+</nav>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+<svg class="w-6 h-6 text-text-charcoal" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+</svg>
+<h1 class="font-display text-2xl tracking-widest uppercase">Auvérer</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="search">search</span>
+</button>
+<button class="relative p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="shopping_bag">shopping_bag</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-accent-gold rounded-full"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- 1. Hero Section -->
+<section class="relative h-screen w-full overflow-hidden flex items-center justify-center pt-20">
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-[10s] hover:scale-105" data-alt="A high-fashion, editorial cinematic photograph of a serene woman with radiant, dewy skin leaning against a soft taupe architectural column. The lighting is golden hour warmth mixed with soft studio diffusion, creating long shadows and highlighting the texture of a luxury cream bottle in the foreground. The overall aesthetic is minimalist, expensive, and tranquil, using a palette of creams and golds." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGmvfBGO6hRghpkOubJnOJKiUHlz_rLrBI9PBm-Zg7TEj5iMW2GbyDAOHeX_LXLjNRDVbS8XdReeiaPiKKpJhq0LGH_qWpp20LevUDgW3GmL3S4QupvCN9QhyAxI2makUBjRZU-BF-ImHuWP--6TstpDsZx3oQIMD24dHNgEq6Nh5i2ZUz9n6QPpK4oN1Ub-iUDASbsHFoXHcYldum484jYuxlYhGMTHEx-xErNQRZh1sByoCOvt0u')">
+</div>
+<div class="absolute inset-0 bg-black/10"></div>
+</div>
+<div class="relative z-10 text-center text-white px-6 fade-up" id="hero-content">
+<span class="uppercase tracking-[0.3em] text-xs font-semibold mb-6 block">The New Standard of Radiance</span>
+<h2 class="font-display text-5xl md:text-8xl mb-10 max-w-4xl leading-tight">Elevate Your Everyday Essence</h2>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<a class="bg-white text-text-charcoal px-10 py-5 text-xs font-bold uppercase tracking-widest hover:bg-accent-gold hover:text-white transition-all duration-300" href="#">Explore the Collection</a>
+</div>
+</div>
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+<span class="material-symbols-outlined text-white text-3xl" data-icon="expand_more">expand_more</span>
+</div>
+</section>
+<!-- 2. Manifesto Quote -->
+<section class="bg-background-secondary py-32 px-6 lg:px-12 overflow-hidden">
+<div class="max-w-4xl mx-auto text-center fade-up">
+<span class="material-symbols-outlined text-accent-gold mb-8 text-4xl" data-icon="format_quote" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<h3 class="font-display text-3xl md:text-5xl leading-relaxed text-text-charcoal">
+                "We believe beauty is not a checklist, but a conscious choreography of the soul. Auvérer exists to transform your daily routine into a sacred ritual of self-reverence."
+            </h3>
+<div class="mt-12 h-[1px] w-24 bg-accent-gold mx-auto"></div>
+<p class="mt-8 uppercase tracking-[0.2em] text-[10px] font-bold text-on-surface-variant">The Auvérer Manifesto</p>
+</div>
+</section>
+<!-- 3. The Ritual -->
+<section class="bg-background py-32 px-6 lg:px-12">
+<div class="max-w-[1440px] mx-auto">
+<div class="mb-20 text-center">
+<h2 class="font-display text-4xl md:text-6xl text-text-charcoal mb-4">The Three Pillars</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto">A simplified architecture for optimal skin health and timeless luminosity.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+<!-- Step 1 -->
+<div class="group fade-up" style="transition-delay: 100ms;">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden mb-8">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Close-up photograph of a viscous, honey-colored cleansing nectar being poured into a crystal clear glass bowl. The lighting captures the amber transparency and thick texture of the liquid. The background is a clean, ivory-toned marble surface, conveying purity and clinical luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbdH7SbQKf9225iBoztpBBjrgMEyvjx8ePvxEIsg8YaRvElqwxO5x42N8vZRkNBCEhqrVAbWexsw7d32JcPyMGvY_C-mfCcEEWYlI7CcJisBE8fWasoNjlOQVpta8dqOkEXjtGYl95sYZOwjCafsDsV3R8r0SBcX6MXCXE9OJtI8YD6woIDApiLJ7nJkrPQp1pwyAs97cka6IRyLaQWkwy6L7xrcI3rNEeNDManv4p4ake7hoP7bL7">
+</div>
+<span class="text-accent-gold font-bold text-sm tracking-widest uppercase">Step 01: Purify</span>
+<h4 class="font-display text-2xl mt-2 mb-4">Cleansing Nectar</h4>
+<p class="text-on-surface-variant leading-relaxed text-sm">A biocompatible oil-to-milk emulsion that removes impurities while preserving the delicate acid mantle.</p>
+</div>
+<!-- Step 2 -->
+<div class="group fade-up" style="transition-delay: 300ms;">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden mb-8">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Macro photography of a single, shimmering droplet of cellular serum suspended from a glass dropper. The droplet reflects a soft, warm studio light, revealing a multi-dimensional glow. The color palette is composed of soft beige and iridescent taupe, representing advanced biotechnology and cellular health." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb5fuzEe-9RLg2D7ei3Xf1Xlam_qg6ThGVMP8Q6QBriaDBkf9UjpuOxr5PjTogLMeVXX_xaeDaayB86RVnVt1_JMwtHrCJSqJdpvUDKAs5VF9O7zm-xzaerVqHPg78vgezvKR54SqbXygJLz-hh0trtkLxpaeUSUYMe2Ik_MT7_ar2erJQaOWMs9NsYUjr8BinZcUt80cmrYnhNVLk6uH3DRe6tuotl6DMZ1TVNG5pryfeEvPqUYrl">
+</div>
+<span class="text-accent-gold font-bold text-sm tracking-widest uppercase">Step 02: Transform</span>
+<h4 class="font-display text-2xl mt-2 mb-4">Cellular Elixir</h4>
+<p class="text-on-surface-variant leading-relaxed text-sm">Targeted peptides and botanical stem cells penetrate deep to signal regeneration and structural repair.</p>
+</div>
+<!-- Step 3 -->
+<div class="group fade-up" style="transition-delay: 500ms;">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden mb-8">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Detailed shot of a thick, whipped white barrier cream being smoothed onto skin. The texture shows rich peaks and valleys, looking incredibly hydrating and protective. The skin tone is radiant and healthy. The image uses high-key lighting to emphasize the pristine white color of the cream against a warm cream background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdPCmX-MgBiDLtrKP0bH65rJRUbsEtbCeOyN0JMGMSDk8CZxdou65kznH5wfBrvlF3ewBVrUubMOFDnCSCDt0rRlHmUFBkIxiqRm448DRwKm_59o8TKeXrKL1HqET5JXuDqvjpfCNFZNa4w0_YzcFLQ39bL46L1wqBpXh-0LNZE8t7r3_xka5ulk6SHl0kPfvytKRVXs7b75Uo4r6vpsyX0OJF3B_i47cTy-pb1qNdbIY5Sj8XcksE">
+</div>
+<span class="text-accent-gold font-bold text-sm tracking-widest uppercase">Step 03: Protect</span>
+<h4 class="font-display text-2xl mt-2 mb-4">Barrier Cream</h4>
+<p class="text-on-surface-variant leading-relaxed text-sm">A lipid-rich seal that fortifies the skin's natural defense system against environmental stressors.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Featured Collection (Asymmetric) -->
+<section class="bg-surface-container-low py-32 px-6 lg:px-12">
+<div class="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7 fade-up">
+<div class="relative group">
+<img class="w-full aspect-[16/10] object-cover" data-alt="A large, high-resolution lifestyle image of a luxury skincare set arranged on a geometric stone pedestal. Soft linen fabrics are draped nearby. The lighting is dramatic with strong shadows, creating a sense of depth and architectural beauty. The bottles are heavy glass with brushed gold caps, catching the light elegantly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYfT7-RzXiHyu5d7bfciZSokMgRxuVqMtgUGnxtFlx4Cgo1XeKD3TgWFisnN3caR96B298ZLBAPaLykKUmYFBHatlPIwQORp7Ts9_hxJsFzbpPURZKhTccwaFqYGWzL7SEj0uia1p8eF2EJw5dEFMhh7FQ32HW_u12fBDBhyGFzEfqGfJVRRcUCLLrsjmy8exaPaqjAEQCAv2lD0ZXYbc7jOLy0xn02Wn6VWW57M_7MANMaueey_kx">
+<div class="absolute bottom-10 left-10 bg-white p-8 max-w-sm hidden md:block">
+<h5 class="font-display text-3xl mb-4">The Auric Collection</h5>
+<p class="text-xs text-on-surface-variant leading-loose mb-6">Our flagship trio, designed to reset your complexion to its most balanced, radiant state.</p>
+<a class="inline-block border-b border-text-charcoal pb-1 text-[10px] font-bold uppercase tracking-widest hover:text-accent-gold hover:border-accent-gold transition-all" href="#">Shop the Set</a>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 flex flex-col gap-12">
+<div class="fade-up" style="transition-delay: 200ms;">
+<img class="w-full aspect-square object-cover mb-6" data-alt="Product portrait of a single tall, frosted glass bottle with a minimalist label. The background is a soft taupe gradient. The lighting is focused on the label's elegant typography, highlighting the brand name Auvérer and the product name cellular elixir." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh9LzQUOMPMYf0ELt5TWOL0RnmVeFgMBiH8VAdjIP_Maak9spGwKO_8wbZDEJENddAVQ9XNeRdaWf1j35INVWdIJP8V_DrD3MK54xP27Yu3acPDx_1YREUMDB1hw5Fbsp6Jw52EefQjZquaoKtCswgsXnFSPmbabbg6SqvHyjJhAb4UP_vI-vkR1mucc4btgqh_qS9B2yJji7VR3Y6O_7M9pdScpxx8mGCplbQVfeqlZzFfmW69F3b">
+<h5 class="font-display text-2xl">Luminous Overnight Mask</h5>
+<p class="text-sm text-on-surface-variant mt-2 mb-4">A regenerative treatment that works with your circadian rhythm.</p>
+<span class="text-lg font-medium">$145.00</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Ingredient Spotlight -->
+<section class="bg-background py-32">
+<div class="max-w-[1440px] mx-auto flex flex-col lg:flex-row items-center gap-20 px-6 lg:px-12">
+<div class="lg:w-1/2 fade-up">
+<img class="w-full aspect-square object-cover shadow-2xl" data-alt="Macro photography of a rare botanical flower, the Golden Saffron Crocus, glistening with dew. The details of the red stigmas are sharp and vibrant against the soft purple petals. The lighting is ethereal, creating a glow from within the bloom. This represents the rare, high-potency ingredients used in Auvérer products." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr5xqPS8k_y40mqgALKuqZ3IH30sMSeFQxCDJ3qTzEJcd9ZSSvTtjSzWxXisC9bu6kkAkLBNQ60hvDYcX04QseirkIjpQ-hgg7ynH_BqyO4khph5aEje4dSuvmpD4k1Qtvf_GcBQyhGbTWPehIMMLYkganO-reRUGcIgKGPqFSU9ToMbjqXcVTyHgmDqM7R9aBwz_YVrxAjcq2WIH_TQfvKgHNz0_Jilkmn_XbtjynKen4cj2mlRVE">
+</div>
+<div class="lg:w-1/2 fade-up">
+<span class="text-accent-gold uppercase tracking-[0.3em] text-xs font-bold">The Science of Soul</span>
+<h2 class="font-display text-4xl md:text-6xl mt-6 mb-10 leading-tight">Golden Saffron Stem Cells</h2>
+<p class="text-body-lg text-on-surface-variant leading-relaxed mb-10">
+                    Harnessing the regenerative power of the world’s most precious spice. Our proprietary extraction process stabilizes the potent crocin compounds, delivering antioxidant protection that is 40x more effective than Vitamin C.
+                </p>
+<div class="grid grid-cols-2 gap-8">
+<div>
+<span class="block font-display text-3xl text-text-charcoal mb-2">98%</span>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-tertiary-container">Natural Origin Content</p>
+</div>
+<div>
+<span class="block font-display text-3xl text-text-charcoal mb-2">Biomimetic</span>
+<p class="text-[10px] uppercase tracking-widest font-bold text-on-tertiary-container">Delivery System</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. Editorial Pause -->
+<section class="h-[716px] w-full overflow-hidden relative">
+<div class="w-full h-full bg-fixed bg-center bg-cover" data-alt="An ultra-minimalist, wide-angle photograph of a single desert dune under a pale, cream-colored sky. The sand is a soft taupe, with ripples that resemble the texture of rich cream. The lighting is flat and soft, creating a meditative, almost abstract landscape that evokes feelings of calm, space, and purity." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAG6i2a0g-ZCgytcAquQtwYWAeMFVXRYZFJ65FawAdlvH7LAo7j-2GJSmZ3N3dkxog2us-e-zy2cTqQZHetzwyleCCDgV34MdUlopQOwvcxxOdI8vBkOC2TaghzeK1tfiQHXy8V5LTz0VyB4WUYP95gY15lX_AExaJSw3EQDL86n4T3XtsMnqFTRWz7PSHN7E3plsNZ-ZkIH_4qI0DtDPt-0k0OB7s_GRncxNb0tdqfU4TIx1asJSsz')">
+</div>
+</section>
+<!-- 7. Clinical Results -->
+<section class="bg-background-primary py-32 px-6 lg:px-12">
+<div class="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
+<div class="fade-up" style="transition-delay: 100ms;">
+<h4 class="font-display text-7xl md:text-8xl text-accent-gold mb-4">+94%</h4>
+<p class="uppercase tracking-widest text-[10px] font-bold text-text-charcoal mb-4">Immediate Hydration</p>
+<p class="text-xs text-on-surface-variant">Measured via corneometry 30 minutes after application of the Barrier Cream.</p>
+</div>
+<div class="fade-up" style="transition-delay: 300ms;">
+<h4 class="font-display text-7xl md:text-8xl text-accent-gold mb-4">86%</h4>
+<p class="uppercase tracking-widest text-[10px] font-bold text-text-charcoal mb-4">Increased Elasticity</p>
+<p class="text-xs text-on-surface-variant">Clinical improvement in skin bounce-back after 28 days of Cellular Elixir use.</p>
+</div>
+<div class="fade-up" style="transition-delay: 500ms;">
+<h4 class="font-display text-7xl md:text-8xl text-accent-gold mb-4">-32%</h4>
+<p class="uppercase tracking-widest text-[10px] font-bold text-text-charcoal mb-4">Fine Line Reduction</p>
+<p class="text-xs text-on-surface-variant">Visible reduction in depth of crow's feet as validated by independent dermatologists.</p>
+</div>
+</div>
+</section>
+<!-- 8. Philosophy Passage -->
+<section class="bg-background py-32 px-6">
+<div class="max-w-2xl mx-auto fade-up">
+<h3 class="font-display text-3xl mb-12 text-center">The Architecture of Aging Gracefully</h3>
+<div class="space-y-8 text-on-surface-variant leading-relaxed text-body-md first-letter:text-5xl first-letter:font-display first-letter:mr-3 first-letter:float-left">
+<p>
+                    Aging is not a problem to be solved, but a journey to be honored. At Auvérer, we reject the narrative of "anti-aging." Instead, we focus on biological optimization—giving the skin the structural support and nutrient density it needs to function at its peak, regardless of the year on your passport.
+                </p>
+<p>
+                    Our formulations are built on the principle of biomimicry. We study the skin's natural healing mechanisms and design molecules that speak its language. From the specific lipid ratios in our Barrier Cream to the peptide sequences in our Elixir, everything is engineered to complement, not override, your natural beauty.
+                </p>
+<p>
+                    We believe that when you care for your skin with intention, you are not just maintaining an appearance; you are cultivating a relationship with your future self. It is a slow, methodical process that yields profound, lasting results.
+                </p>
+</div>
+</div>
+</section>
+<!-- 9. Testimonial -->
+<section class="bg-surface-container py-32 px-6 lg:px-12 relative overflow-hidden">
+<div class="max-w-4xl mx-auto text-center relative z-10 fade-up">
+<div class="flex justify-center gap-1 mb-8">
+<span class="material-symbols-outlined text-accent-gold text-xs" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-accent-gold text-xs" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-accent-gold text-xs" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-accent-gold text-xs" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-accent-gold text-xs" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<h2 class="font-display text-3xl md:text-5xl italic leading-tight text-text-charcoal mb-10">
+                "I have spent decades trying every luxury brand on the market, but Auvérer is different. It’s the first time my skin feels like it's finally exhaling. The glow is not just on the surface; it's from within."
+            </h2>
+<div class="flex items-center justify-center gap-4">
+<div class="w-12 h-12 rounded-full bg-cover" data-alt="Profile portrait of a sophisticated woman in her 50s with elegant, silver-streaked hair and glowing, healthy skin. She is wearing a simple linen blouse and looking slightly away from the camera with a confident, serene smile. High-end, soft lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGiEaHkfvvn7-r37gs_W2q-sRytPUQMjqBEcttPgxoEwFHp3hTOsLt4aZzO5kV9p1SrLTTP8eJ8Gk11hbeMfDNtX-wChlkwVjWYZL5VNoo4Fb7vgA1qf0X48pwIQe6CuEnDXCUE7-QGljwZv1R7Cd8EvhNo00Zcp7a3-7dnnicl1wvtoEI0DK2k7qtJ7MXarJNqDrIYfY8BawKBaKAnGTPW3PYqnxok49eXjBG2frZ7-6OSQfnVdSb')"></div>
+<div class="text-left">
+<p class="font-bold uppercase tracking-widest text-[10px]">Eleanor V.</p>
+<p class="text-[10px] text-on-surface-variant">Architect &amp; Creative Director</p>
+</div>
+</div>
+</div>
+<div class="absolute -bottom-20 -right-20 opacity-5">
+<svg class="w-96 h-96 text-text-charcoal" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+</svg>
+</div>
+</section>
+<!-- 10. Press Strip -->
+<section class="py-16 border-b border-outline-variant/30 bg-background">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-wrap justify-between items-center gap-10 grayscale opacity-40">
+<span class="font-display text-2xl tracking-tighter">VOGUE</span>
+<span class="font-display text-2xl tracking-tighter">Harper's BAZAAR</span>
+<span class="font-display text-2xl tracking-tighter">Forbes</span>
+<span class="font-display text-2xl tracking-tighter">WWD</span>
+<span class="font-display text-2xl tracking-tighter">Wallpaper*</span>
+</div>
+</section>
+<!-- 11. Journal Preview -->
+<section class="bg-background py-32 px-6 lg:px-12">
+<div class="max-w-[1440px] mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div>
+<span class="text-accent-gold uppercase tracking-[0.3em] text-xs font-bold">The Journal</span>
+<h2 class="font-display text-4xl md:text-6xl mt-4">Essays on Living Well</h2>
+</div>
+<a class="border-b border-text-charcoal pb-1 text-[10px] font-bold uppercase tracking-widest hover:text-accent-gold hover:border-accent-gold transition-all" href="#">Read All Entries</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="group cursor-pointer fade-up" style="transition-delay: 100ms;">
+<div class="aspect-[16/9] overflow-hidden mb-6">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" data-alt="An aesthetic tabletop arrangement featuring a leather-bound notebook, a ceramic cup of white tea, and a glass of water on a sun-drenched oak table. The soft morning light creates long, peaceful shadows. The setting represents a slow, mindful lifestyle and morning journaling ritual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtYXesmXXRIOO4AJ6fEGq2NIFtKG6R9wsqqoDu8bIY8REtLnWKqdAZlLthdhw9UrPIL-8XMeAbqDXKtTE_vdBHTMhV7-Ri0b39BQOyE0dg3FFDqXqPewmEHncEtpUvG94_vt2zTFZk8IhV7BkQdyw6dZM2M0s-3TpTGs9R4t0E7elXkV7zVv8b371q5GRr8bbHiF309P7SM7iznK5e5AkG1ymXmruLkmM4KQNFE7gocU8HUdss9FQQ">
+</div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Wellness</span>
+<h4 class="font-display text-2xl mt-3 mb-4 group-hover:text-accent-gold transition-colors">The Art of the Morning Silence</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Discover why the first 15 minutes of your day define your skin's cortisol levels.</p>
+</div>
+<div class="group cursor-pointer fade-up" style="transition-delay: 200ms;">
+<div class="aspect-[16/9] overflow-hidden mb-6">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" data-alt="Close-up of hands mixing raw, organic ingredients like dried flowers and oils in a ceramic mortar and pestle. The scene is lit with natural, cool light from a nearby window, emphasizing the organic textures and the process of slow creation. Represents botanical heritage and formulation art." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAfUk9yOOI8un0_E7C7L1oaYj_wPlszeQ3xnBdigKhrL5rkKjQxWKMtXNi8KRDg0xt7xOQm2WQGFXzw2SjA3IMUZLqjb_5yXO7ylNChY2R8wvVli1xHxz_F43-FLfAxCTa2Cmbu-P8USWP_Itx5zUOuxDlT_TiEaOiUk62haHW5gnk9se256B_YFMoXgg7LVx486kGac11i46DZphtS9UQYqnAez6t8wS7_TwbB0OTCD-J5CUDiJzM">
+</div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Ingredients</span>
+<h4 class="font-display text-2xl mt-3 mb-4 group-hover:text-accent-gold transition-colors">Sourcing the Extraordinary</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Behind the scenes of our wild-harvested saffron expedition in the High Atlas.</p>
+</div>
+<div class="group cursor-pointer fade-up" style="transition-delay: 300ms;">
+<div class="aspect-[16/9] overflow-hidden mb-6">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" data-alt="A minimalist architectural interior with clean lines, concrete walls, and a single sculptural chair placed next to a large floor-to-ceiling window looking out onto a misty garden. The mood is calm and contemplative, reflecting the brand's aesthetic philosophy of essentialism and quiet luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeHXU9T80wATfikYd4MCbi_WQfDCEQRJypv-Lfp3tM2g3RkHSCOMuzCQp-JM-oIuG9DAHr5JHWY-nH5E9h2Guoen7T_jD1MsyjiM0Ym-Bw0ajQsPkrEgKYNnM55moWMXN68Ug8hMk8sXKjBcJQpPTtbrp1r-PPEFcTfbvQ72ywOyJ-KsxuA5mZ0ROdj2xKY2aoK3lBBnSxd-pKJgztFMgZCQvAyJY7xfqVedBgZEsLZnncOhyr-wgW">
+</div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Space</span>
+<h4 class="font-display text-2xl mt-3 mb-4 group-hover:text-accent-gold transition-colors">Minimalism as a Skincare Philosophy</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Why your vanity—and your complexion—thrives on less, but better.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 12. Community CTA -->
+<section class="relative h-[819px] flex items-center justify-center text-center overflow-hidden">
+<div class="absolute inset-0">
+<img class="w-full h-full object-cover" data-alt="A wide shot of a community gathering in a bright, sunlit minimalist space with high ceilings. People are engaged in quiet conversation, holding glass cups. The atmosphere is sophisticated and inclusive, with a focus on natural materials and a warm, cream-colored palette. The image feels welcoming and aspirational." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA95JYbryADpsbcWOO_DhqZTiwN0ncYzoXU47JpvSp4yKBe7MQyrhJ3PWD49Q3O2wXHvGCz7I-yDhRtxdXGEs7dvWEWGyFW0Qmu9VPqmrX6BsJzy8ydblbKfIs9J2jE51qhwx08KDWOj-1eKxxnHSehsUUrQCsoGlNzqEYSpR1IC966OhzYHpOTfp-j-UsKaIkBCN-OxhEflwMavaSpEG1YkxqYxZS7aRHNuqTP77VzdE-1GooZxJ0h">
+<div class="absolute inset-0 bg-text-charcoal/40"></div>
+</div>
+<div class="relative z-10 px-6 fade-up">
+<h2 class="font-display text-5xl md:text-8xl text-white mb-10">Join the Circle</h2>
+<p class="text-white text-lg md:text-xl max-w-2xl mx-auto mb-12 opacity-90">An exclusive community for those who value the intersection of science, soul, and slow living.</p>
+<a class="inline-block border-2 border-white text-white px-12 py-5 text-xs font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-text-charcoal transition-all" href="#">Become a Member</a>
+</div>
+</section>
+<!-- 13. Newsletter -->
+<section class="bg-background-primary py-24 px-6">
+<div class="max-w-xl mx-auto text-center fade-up">
+<h3 class="font-display text-3xl mb-4">A Note on Living</h3>
+<p class="text-sm text-on-surface-variant mb-10">Occasional dispatches on ritual, longevity, and the pursuit of light.</p>
+<form class="flex flex-col sm:flex-row gap-4">
+<input class="flex-1 bg-transparent border-0 border-b border-outline py-4 px-0 focus:ring-0 focus:border-accent-gold transition-colors text-sm placeholder:text-outline-variant" placeholder="Email Address" type="email">
+<button class="bg-text-charcoal text-white px-10 py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-accent-gold transition-colors" type="submit">Subscribe</button>
+</form>
+</div>
+</section>
+<!-- 14. Footer -->
+<footer class="bg-text-charcoal text-white py-20 px-6 lg:px-12">
+<div class="max-w-[1440px] mx-auto">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 mb-20">
+<div class="col-span-2">
+<div class="flex items-center gap-2 mb-8">
+<svg class="w-5 h-5 text-accent-gold" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+</svg>
+<h2 class="font-display text-xl tracking-widest uppercase">Auvérer</h2>
+</div>
+<p class="text-sm opacity-60 leading-relaxed max-w-xs">
+                        Elevated skincare for the discerning individual. Formulated with clinical precision and botanical wisdom.
+                    </p>
+</div>
+<div>
+<h5 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-accent-gold">Shop</h5>
+<ul class="space-y-4 text-sm opacity-80">
+<li><a class="hover:text-accent-gold" href="#">All Products</a></li>
+<li><a class="hover:text-accent-gold" href="#">Ritual Sets</a></li>
+<li><a class="hover:text-accent-gold" href="#">Travel Collection</a></li>
+<li><a class="hover:text-accent-gold" href="#">Gifting</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-accent-gold">About</h5>
+<ul class="space-y-4 text-sm opacity-80">
+<li><a class="hover:text-accent-gold" href="#">Our Story</a></li>
+<li><a class="hover:text-accent-gold" href="#">Manifesto</a></li>
+<li><a class="hover:text-accent-gold" href="#">Sustainability</a></li>
+<li><a class="hover:text-accent-gold" href="#">Stockists</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-accent-gold">Client Care</h5>
+<ul class="space-y-4 text-sm opacity-80">
+<li><a class="hover:text-accent-gold" href="#">Shipping</a></li>
+<li><a class="hover:text-accent-gold" href="#">Returns</a></li>
+<li><a class="hover:text-accent-gold" href="#">Contact</a></li>
+<li><a class="hover:text-accent-gold" href="#">Privacy Policy</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-accent-gold">Connect</h5>
+<ul class="space-y-4 text-sm opacity-80">
+<li><a class="hover:text-accent-gold" href="#">Instagram</a></li>
+<li><a class="hover:text-accent-gold" href="#">Pinterest</a></li>
+<li><a class="hover:text-accent-gold" href="#">Twitter</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 text-[10px] font-bold uppercase tracking-widest">
+<p>© 2024 AUVÉRER LUXE SKINCARE. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-8">
+<span>Terms of Service</span>
+<span>Accessibility</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Intersection Observer for fade-up animations
+        const observerOptions = {
+            root: null,
+            threshold: 0.1,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Optionally unobserve after showing
+                    // observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(element => {
+            observer.observe(element);
+        });
+
+        // Hero fade-up on load
+        window.addEventListener('load', () => {
+            document.getElementById('hero-content').classList.add('visible');
+        });
+
+        // Simple smooth scrolling for links (handled by tailwind scroll-smooth but for JS triggers)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if(target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body></html>

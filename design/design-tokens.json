@@ -1,0 +1,99 @@
+{
+  "colors": {
+    "brand": {
+      "primary": "#0A0A0A",
+      "secondary": "#C9AE7E",
+      "accent": "#EFE9DD"
+    },
+    "surface": {
+      "background": "#0A0A0A",
+      "surface": "#131211",
+      "elevated": "#1A1815",
+      "dim": "#060606",
+      "container": "#151311",
+      "container-low": "#0E0D0C"
+    },
+    "text": {
+      "primary": "#EFE9DD",
+      "secondary": "#B9AF9F",
+      "muted": "#877E70",
+      "inverse": "#F6F3ED"
+    },
+    "border": {
+      "default": "#2A2723",
+      "strong": "#4A4238"
+    },
+    "accent": {
+      "gold": "#B79A63"
+    },
+    "status": {
+      "success": "#16794C",
+      "warning": "#A66A00",
+      "error": "#B42318",
+      "info": "#175CD3"
+    }
+  },
+  "typography": {
+    "display": "Cormorant Garamond",
+    "body": "Inter",
+    "mono": "SF Mono"
+  },
+  "spacing": {
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "12": "3rem",
+    "16": "4rem",
+    "24": "6rem",
+    "32": "8rem"
+  },
+  "layout": {
+    "container": {
+      "sm": "640px",
+      "md": "768px",
+      "lg": "1024px",
+      "xl": "1280px",
+      "2xl": "1536px"
+    },
+    "grid": {
+      "columns": 12,
+      "gap": "1.5rem"
+    }
+  },
+  "radius": {
+    "sm": "0",
+    "md": "0",
+    "lg": "0",
+    "xl": "0",
+    "pill": "9999px"
+  },
+  "shadows": {
+    "sm": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    "md": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    "lg": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    "xl": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+  },
+  "motion": {
+    "duration": {
+      "fast": 0.35,
+      "normal": 0.5,
+      "slow": 1.2
+    },
+    "ease": {
+      "standard": "power3.out",
+      "in": "power3.in",
+      "out": "power3.out",
+      "inOut": "power3.inOut"
+    }
+  },
+  "breakpoints": {
+    "sm": "640px",
+    "md": "768px",
+    "lg": "1024px",
+    "xl": "1280px",
+    "2xl": "1536px"
+  }
+}

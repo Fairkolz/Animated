@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Auvérer — The Formulation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    paper: "var(--paper)",
+                    "paper-raised": "var(--paper-raised)",
+                    ink: "var(--ink)",
+                    "ink-soft": "var(--ink-soft)",
+                    "ink-muted": "var(--ink-muted)",
+                    gold: "var(--gold)",
+                    "gold-deep": "var(--gold-deep)",
+                },
+                fontFamily: {
+                    display: ["'EB Garamond'", "serif"],
+                    body: ["Inter", "sans-serif"],
+                },
+            },
+        },
+    };
+</script>
+<style>
+    :root {
+        --paper: #faf5ec;
+        --paper-raised: #f2ecdf;
+        --ink: #17140f;
+        --ink-soft: #453f34;
+        --ink-muted: #8a8171;
+        --gold: #a98e5f;
+        --gold-deep: #8c7146;
+        --hairline: rgba(23, 20, 15, 0.14);
+        --hairline-strong: rgba(23, 20, 15, 0.32);
+        --glass: rgba(250, 245, 236, 0.85);
+        --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    ::selection { background: var(--gold); color: var(--paper); }
+
+    .bg-glass { background-color: var(--glass); }
+
+    html { scroll-behavior: smooth; }
+
+    body { font-feature-settings: "ss01"; text-rendering: optimizeLegibility; }
+
+    .eyebrow {
+        font-family: Inter, sans-serif;
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .rule-v { width: 1px; background: var(--hairline); }
+
+    .nav-link {
+        position: relative;
+        transition: color 0.5s var(--ease);
+    }
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -6px;
+        height: 1px;
+        width: 100%;
+        background: currentColor;
+        transform: scaleX(0);
+        transform-origin: right center;
+        transition: transform 0.6s var(--ease);
+    }
+    .nav-link:hover::after,
+    .nav-link:focus-visible::after { transform: scaleX(1); transform-origin: left center; }
+    .nav-link[aria-current="page"]::after { transform: scaleX(1); }
+
+    .btn-line { position: relative; overflow: hidden; }
+    .btn-line span { position: relative; z-index: 1; transition: color 0.5s var(--ease); }
+    .btn-line::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--ink);
+        transform: translateY(101%);
+        transition: transform 0.6s var(--ease);
+    }
+    .btn-line:hover::before,
+    .btn-line:focus-visible::before { transform: translateY(0); }
+    .btn-line:hover span,
+    .btn-line:focus-visible span { color: var(--paper); }
+
+    .callout h3 {
+        background-image: linear-gradient(currentColor, currentColor);
+        background-size: 0% 1px;
+        background-repeat: no-repeat;
+        background-position: 0 100%;
+        transition: background-size 0.7s var(--ease);
+        padding-bottom: 4px;
+        display: inline;
+    }
+    .callout:hover h3,
+    .callout:focus-within h3 { background-size: 100% 1px; }
+    .c-right { text-align: right; }
+    .c-right h3 { background-position: 100% 100%; }
+
+    .lead {
+        position: absolute;
+        width: 96px;
+        height: 1px;
+        background: var(--hairline-strong);
+        transform: rotate(var(--rot, 0deg));
+        transform-origin: left center;
+        transition: background-color 0.5s var(--ease);
+    }
+    .node {
+        position: absolute;
+        top: -3.5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 9999px;
+        background: var(--paper);
+        border: 1px solid var(--gold-deep);
+        transition: transform 0.5s var(--ease), background-color 0.5s var(--ease);
+    }
+    .callout:hover .lead,
+    .callout:focus-within .lead { background: var(--gold-deep); }
+    .callout:hover .node,
+    .callout:focus-within .node { background: var(--gold-deep); transform: scale(1.5); }
+
+    .c1 .lead { right: -112px; top: 44px; --rot: 14deg; }
+    .c2 .lead { left: -112px; top: 44px; --rot: -14deg; transform-origin: right center; }
+    .c3 .lead { right: -104px; top: 28px; --rot: -12deg; }
+    .c4 .lead { left: -104px; top: 28px; --rot: 12deg; transform-origin: right center; }
+    .c1 .node, .c3 .node { right: -4px; }
+    .c2 .node, .c4 .node { left: -4px; }
+
+    .ring-spin { animation: spin 120s linear infinite; transform-origin: center; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .bottle-float { animation: drift 9s ease-in-out infinite alternate; }
+    @keyframes drift { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 1s var(--ease), transform 1s var(--ease); transition-delay: var(--d, 0ms); will-change: opacity, transform; }
+        .reveal.in { opacity: 1; transform: none; }
+        .lead.reveal-wire { transform: rotate(var(--rot, 0deg)) scaleX(0); }
+        .lead.reveal-wire.in { transform: rotate(var(--rot, 0deg)) scaleX(1); transition: transform 1.2s var(--ease), background-color 0.5s var(--ease); transition-delay: var(--d, 0ms); }
+    }
+
+    .ghost-mark {
+        font-family: 'EB Garamond', serif;
+        line-height: 0.85;
+        -webkit-text-stroke: 1px rgba(23, 20, 15, 0.18);
+        color: transparent;
+        user-select: none;
+    }
+
+    a, button { outline-offset: 4px; }
+    :focus-visible { outline: 1.5px solid var(--gold-deep); }
+</style>
+</head>
+<body class="bg-paper text-ink font-body antialiased min-h-screen flex flex-col overflow-x-hidden">
+
+<a href="#formulation" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:bg-ink focus:text-paper focus:px-4 focus:py-2 eyebrow">Skip to content</a>
+
+<header class="fixed top-0 inset-x-0 z-50 border-b border-[color:var(--hairline)] bg-glass backdrop-blur-md">
+    <nav class="flex items-center justify-between px-6 md:px-16 h-20" aria-label="Primary">
+        <ul class="hidden lg:flex items-center gap-8">
+            <li><a class="nav-link eyebrow text-ink-soft hover:text-ink" href="#">Collection</a></li>
+            <li><a class="nav-link eyebrow text-ink-soft hover:text-ink" href="#">Philosophy</a></li>
+            <li><a class="nav-link eyebrow text-ink hover:text-ink" aria-current="page" href="#">About</a></li>
+            <li><a class="nav-link eyebrow text-ink-soft hover:text-ink" href="#">Journal</a></li>
+        </ul>
+        <button class="lg:hidden p-2 -ml-2" aria-label="Open menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+        </button>
+        <a href="#" class="absolute left-1/2 -translate-x-1/2 font-display text-2xl tracking-[0.42em] pl-[0.42em]" aria-label="Auvérer home">AUVÉRER</a>
+        <div class="flex items-center gap-6">
+            <button aria-label="Search" class="p-2 text-ink hover:text-gold-deep transition-colors duration-500">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+            </button>
+            <button aria-label="Account" class="hidden sm:block p-2 text-ink hover:text-gold-deep transition-colors duration-500">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            </button>
+            <button aria-label="Shopping bag, 0 items" class="relative p-2 -mr-2 text-ink hover:text-gold-deep transition-colors duration-500">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>
+                <span class="absolute top-0.5 right-0 w-4 h-4 rounded-full bg-ink text-paper text-[9px] leading-4 font-medium text-center" aria-hidden="true">0</span>
+            </button>
+        </div>
+    </nav>
+</header>
+
+<main id="formulation" class="flex-grow pt-40 pb-32 px-6 md:px-16 max-w-[1600px] mx-auto w-full">
+
+    <header class="text-center mb-24 md:mb-32">
+        <p class="reveal eyebrow text-gold-deep mb-8">Maison Auvérer &mdash; Clinical Botanicals</p>
+        <h1 class="reveal font-display text-ink leading-[0.95] tracking-[-0.02em] text-[clamp(56px,9vw,128px)]" style="--d:100ms">
+            <em class="font-normal">The</em> Formulation
+        </h1>
+        <div class="reveal flex items-center justify-center gap-6 mt-10" style="--d:200ms" aria-hidden="true">
+            <span class="block h-px w-16 bg-[color:var(--hairline-strong)]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+            <span class="block h-px w-16 bg-[color:var(--hairline-strong)]"></span>
+        </div>
+        <p class="reveal mx-auto mt-10 max-w-[52ch] text-lg md:text-xl leading-[1.8] text-ink-muted" style="--d:300ms">
+            A clinical approach to botanical science, meticulously engineered for ultimate cellular resonance.
+        </p>
+    </header>
+
+    <section class="relative min-h-[720px] lg:min-h-[880px] flex items-center justify-center" aria-label="Formulation principles">
+
+        <figure class="relative z-10 m-0 flex flex-col items-center reveal" style="--d:150ms">
+            <div class="absolute pointer-events-none" style="width:min(150vw,900px);aspect-ratio:1;top:50%;left:50%;transform:translate(-50%,-54%)">
+                <svg viewBox="0 0 800 800" fill="none" class="w-full h-full" aria-hidden="true">
+                    <circle cx="400" cy="400" r="298" stroke="var(--hairline)" stroke-width="1"/>
+                    <circle cx="400" cy="400" r="250" stroke="var(--hairline)" stroke-width="1" stroke-dasharray="1 7"/>
+                    <g class="ring-spin">
+                        <circle cx="400" cy="400" r="340" stroke="var(--hairline-strong)" stroke-width="1" stroke-dasharray="2 10"/>
+                        <rect x="397" y="52" width="6" height="6" fill="var(--gold-deep)"/>
+                        <rect x="397" y="742" width="6" height="6" fill="var(--gold-deep)"/>
+                        <rect x="52" y="397" width="6" height="6" fill="var(--gold-deep)"/>
+                        <rect x="742" y="397" width="6" height="6" fill="var(--gold-deep)"/>
+                    </g>
+                    <path d="M400 86v28M400 686v28M86 400h28M686 400h28" stroke="var(--hairline-strong)" stroke-width="1"/>
+                    <text x="400" y="30" text-anchor="middle" fill="var(--ink-muted)" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.3em">N&#176;01</text>
+                </svg>
+            </div>
+            <div class="bottle-float relative">
+                <img
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvh6LIAOSY3oJZvU3TMr7C60WP3jYlq4rBbnMaxj2I2_pRQExBHj_ZZR6-8DmrXEpTxCfjYDxuTDQ4To5prUWaim9Rg6YY1Us16mjuGCynqKY93V7tyqyEB31FDY4WMPlQYN6yfTtYQQkL5wfnpHDdu22S0C313vrA3hsukQKDfOqxrnLazfR9RwzkoOeD-taSiuP9GSc8pKNAOD6PURx0LObszVlblWDduKC_Tz5T6kyOSiqAXXhF"
+                    alt="Auvérer serum in a dark glass bottle with a minimalist white label"
+                    width="480"
+                    height="600"
+                    fetchpriority="high"
+                    decoding="async"
+                    class="relative z-10 object-contain mix-blend-multiply w-[min(72vw,320px)] md:w-[min(38vw,420px)] lg:w-[min(34vw,480px)] h-auto"
+                    style="filter: drop-shadow(0 48px 64px rgba(23, 20, 15, 0.22));"
+                />
+            </div>
+            <figcaption class="mt-10 eyebrow text-ink-muted tracking-[0.35em]">Fig. 01 &mdash; Serum Concentré</figcaption>
+        </figure>
+
+        <article class="callout c1 c-right hidden lg:block absolute top-[4%] left-[3%] xl:left-[7%] w-80 reveal" style="--d:350ms" tabindex="0">
+            <p class="font-display italic text-gold-deep text-lg mb-2">01</p>
+            <h3 class="font-display text-[28px] leading-tight text-ink">Cellular Repair</h3>
+            <p class="mt-3 text-sm leading-[1.75] text-ink-muted">Focused on bio-active restoration and strengthening the skin&rsquo;s fundamental architectural matrix.</p>
+            <span class="lead reveal-wire" style="--rot:14deg;--d:600ms"><span class="node"></span></span>
+        </article>
+
+        <article class="callout c2 hidden lg:block absolute top-[4%] right-[3%] xl:right-[7%] w-80 reveal" style="--d:450ms" tabindex="0">
+            <p class="font-display italic text-gold-deep text-lg mb-2">02</p>
+            <h3 class="font-display text-[28px] leading-tight text-ink">Botanical Vitality</h3>
+            <p class="mt-3 text-sm leading-[1.75] text-ink-muted">Harnessing the potent essence of Japanese Camellia and White Truffle for unparalleled antioxidant defense.</p>
+            <span class="lead reveal-wire" style="--rot:-14deg;--d:700ms"><span class="node"></span></span>
+        </article>
+
+        <article class="callout c3 c-right hidden lg:block absolute bottom-[6%] left-[3%] xl:left-[7%] w-80 reveal" style="--d:550ms" tabindex="0">
+            <p class="font-display italic text-gold-deep text-lg mb-2">03</p>
+            <h3 class="font-display text-[28px] leading-tight text-ink">Hydration Recovery</h3>
+            <p class="mt-3 text-sm leading-[1.75] text-ink-muted">Engineered for deep moisture retention, creating a continuous reservoir of cellular hydration.</p>
+            <span class="lead reveal-wire" style="--rot:-12deg;--d:800ms"><span class="node"></span></span>
+        </article>
+
+        <article class="callout c4 hidden lg:block absolute bottom-[6%] right-[3%] xl:right-[7%] w-80 reveal" style="--d:650ms" tabindex="0">
+            <p class="font-display italic text-gold-deep text-lg mb-2">04</p>
+            <h3 class="font-display text-[28px] leading-tight text-ink">Mineral Rich</h3>
+            <p class="mt-3 text-sm leading-[1.75] text-ink-muted">Infused with raw earth elements to magnetize impurities while reinforcing natural lipid barriers.</p>
+            <span class="lead reveal-wire" style="--rot:12deg;--d:900ms"><span class="node"></span></span>
+        </article>
+
+        <ol class="lg:hidden w-full max-w-xl mt-16 border-t border-[color:var(--hairline)] list-none">
+            <li class="border-b border-[color:var(--hairline)] py-8 reveal">
+                <p class="font-display italic text-gold-deep text-lg mb-2">01</p>
+                <h3 class="font-display text-2xl text-ink">Cellular Repair</h3>
+                <p class="mt-2 text-sm leading-[1.75] text-ink-muted">Focused on bio-active restoration and strengthening the skin&rsquo;s fundamental architectural matrix.</p>
+            </li>
+            <li class="border-b border-[color:var(--hairline)] py-8 reveal" style="--d:100ms">
+                <p class="font-display italic text-gold-deep text-lg mb-2">02</p>
+                <h3 class="font-display text-2xl text-ink">Botanical Vitality</h3>
+                <p class="mt-2 text-sm leading-[1.75] text-ink-muted">Harnessing the potent essence of Japanese Camellia and White Truffle for unparalleled antioxidant defense.</p>
+            </li>
+            <li class="border-b border-[color:var(--hairline)] py-8 reveal" style="--d:200ms">
+                <p class="font-display italic text-gold-deep text-lg mb-2">03</p>
+                <h3 class="font-display text-2xl text-ink">Hydration Recovery</h3>
+                <p class="mt-2 text-sm leading-[1.75] text-ink-muted">Engineered for deep moisture retention, creating a continuous reservoir of cellular hydration.</p>
+            </li>
+            <li class="border-b border-[color:var(--hairline)] py-8 reveal" style="--d:300ms">
+                <p class="font-display italic text-gold-deep text-lg mb-2">04</p>
+                <h3 class="font-display text-2xl text-ink">Mineral Rich</h3>
+                <p class="mt-2 text-sm leading-[1.75] text-ink-muted">Infused with raw earth elements to magnetize impurities while reinforcing natural lipid barriers.</p>
+            </li>
+        </ol>
+    </section>
+
+</main>
+
+<footer class="border-t border-[color:var(--hairline)] px-6 md:px-16 pt-24 pb-8">
+    <div class="max-w-[1600px] mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-16 pb-16">
+            <div class="reveal">
+                <p class="eyebrow text-gold-deep mb-6">The Formulation</p>
+                <a class="btn-line inline-block border border-ink px-12 py-4" href="#">
+                    <span class="eyebrow text-ink">Discover the Collection</span>
+                </a>
+            </div>
+            <p class="ghost-mark text-[clamp(64px,12vw,176px)] tracking-[0.08em]" aria-hidden="true">AUVÉRER</p>
+        </div>
+        <div class="border-t border-[color:var(--hairline)] pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <ul class="flex flex-wrap gap-x-8 gap-y-4">
+                <li><a class="eyebrow text-ink-muted hover:text-ink transition-colors duration-500" href="#">Explore</a></li>
+                <li><a class="eyebrow text-ink-muted hover:text-ink transition-colors duration-500" href="#">Client Care</a></li>
+                <li><a class="eyebrow text-ink-muted hover:text-ink transition-colors duration-500" href="#">Legal</a></li>
+                <li><a class="eyebrow text-ink-muted hover:text-ink transition-colors duration-500" href="#">Social</a></li>
+            </ul>
+            <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">&copy; 2024 Auvérer &mdash; All rights reserved</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var targets = document.querySelectorAll(".reveal, .reveal-wire");
+        if (reduced || !("IntersectionObserver" in window)) {
+            targets.forEach(function (el) { el.classList.add("in"); });
+            return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("in");
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: "0px 0px -5% 0px" });
+        targets.forEach(function (el) { io.observe(el); });
+    })();
+</script>
+</body>
+</html>

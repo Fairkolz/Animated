@@ -1,0 +1,300 @@
+@import '../design/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  overflow-anchor: none;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-background);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-anchor: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Focus visibility */
+::selection {
+  background-color: var(--color-accent-gold);
+  color: var(--color-brand-primary);
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Focus visible — global luxury treatment */
+*:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
+input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--color-accent-gold) !important;
+}
+
+/* PressStrip marquee */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 30s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Drop cap */
+.drop-cap::first-letter {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  float: left;
+  line-height: 0.8;
+  margin-right: 0.5rem;
+  margin-top: 0.1rem;
+  color: var(--color-text-primary);
+  font-weight: 300;
+}
+
+/* Card grid entrance — CSS-driven so it starts at first paint, BEFORE
+   hydration. (The old Motion whileInView pattern hid content after the
+   server paint and replayed on hydrate — that was the blink.) */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise-in > * {
+  animation: rise-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.rise-in > *:nth-child(1) { animation-delay: 0s; }
+.rise-in > *:nth-child(2) { animation-delay: 0.07s; }
+.rise-in > *:nth-child(3) { animation-delay: 0.14s; }
+.rise-in > *:nth-child(4) { animation-delay: 0.21s; }
+.rise-in > *:nth-child(5) { animation-delay: 0.28s; }
+.rise-in > *:nth-child(6) { animation-delay: 0.35s; }
+.rise-in > *:nth-child(7) { animation-delay: 0.42s; }
+.rise-in > *:nth-child(8) { animation-delay: 0.49s; }
+.rise-in > *:nth-child(n + 9) { animation-delay: 0.56s; }
+
+/* Card hover — gentle float. Applied to the link INSIDE the animated
+   grid child: a finished rise-in animation keeps holding `transform`
+   via fill-mode and would otherwise block a hover transform on the
+   same element. */
+.card-float {
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.card-float:hover,
+.card-float:focus-visible {
+  transform: translateY(-6px);
+}
+
+/* Scroll reveal — progressive enhancement. Elements are hidden only
+   when html.js is set (inline script runs before first paint, and only
+   when the reveal observer will run). No hydration replay = no blink. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.js [data-reveal].revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Masked line reveal — display headlines rise out of an overflow mask.
+   Same observer engine as [data-reveal]; the OUTER element stays visible
+   (SSR-safe) while the INNER span carries the motion. */
+[data-reveal='mask'] {
+  overflow: hidden;
+}
+[data-reveal='mask'] > span {
+  display: block;
+}
+.js [data-reveal='mask'] {
+  opacity: 1;
+  transform: none;
+}
+.js [data-reveal='mask'] > span {
+  transform: translateY(112%);
+  transition: transform 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.js [data-reveal='mask'].revealed > span {
+  transform: translateY(0);
+}
+
+/* Nav links — gold hairline grows from the left on hover/focus */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-accent-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Primary CTA — a single slow light sweep on hover. Transform-only
+   (GPU-composited); ::after is inert decoration (pointer-events none). */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: translateX(-160%) skewX(-18deg);
+  transition: transform 1.1s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+.btn-sheen:hover::after,
+.btn-sheen:focus-visible::after {
+  transform: translateX(420%) skewX(-18deg);
+}
+
+/* Boxed arrow inside product cards — nudges toward the link */
+.card-arrow {
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+a:hover .card-arrow,
+a:focus-visible .card-arrow {
+  transform: translateX(6px);
+}
+
+/* Product card image zoom on hover */
+.card-zoom > * {
+  transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+a:hover .card-zoom > *,
+a:focus-visible .card-zoom > * {
+  transform: scale(1.04);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .rise-in > *,
+  .card-float:hover,
+  .card-float:focus-visible {
+    transform: none !important;
+  }
+  .js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .js [data-reveal='mask'] > span {
+    transform: none !important;
+    transition: none !important;
+  }
+  .nav-link::after {
+    transition: none !important;
+  }
+  .btn-sheen::after {
+    display: none !important;
+  }
+  a:hover .card-arrow,
+  a:focus-visible .card-arrow {
+    transform: none !important;
+  }
+  a:hover .card-zoom > *,
+  a:focus-visible .card-zoom > * {
+    transform: none !important;
+  }
+}
+
+/* Utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Product detail page */
+@media (min-width: 1024px) {
+  .product-panel > div { position: sticky; top: 7.5rem; }
+}
+.gallery-thumb:hover { border-color: var(--color-accent-gold) !important; }
+.add-to-bag:active { transform: translateY(1px); }
+
+/* Navigation responsive */
+@media (min-width: 769px) {
+  .nav-desktop { display: flex !important; }
+  .nav-mobile-btn { display: none !important; }
+  .nav-mobile-overlay { display: none !important; }
+}
+@media (max-width: 768px) {
+  .nav-desktop { display: none !important; }
+  .nav-mobile-btn { display: block !important; }
+}
+.nav-link:hover { color: var(--color-accent-gold) !important; }
+.nav-icon-btn:hover { color: var(--color-accent-gold) !important; }
