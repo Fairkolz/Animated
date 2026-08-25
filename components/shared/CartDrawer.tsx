@@ -103,7 +103,7 @@ export default function CartDrawer() {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: '0.5rem',
+                  padding: '0.625rem',
                   color: 'var(--color-text-secondary)',
                   transition: 'color 0.3s ease',
                 }}
@@ -283,8 +283,8 @@ export default function CartDrawer() {
                               onClick={() => setQty(item.slug, item.qty - 1)}
                               aria-label={`Decrease quantity of ${item.name}`}
                               style={{
-                                width: '1.75rem',
-                                height: '1.75rem',
+                                width: '2.75rem',
+                                height: '2.75rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -327,8 +327,8 @@ export default function CartDrawer() {
                               onClick={() => setQty(item.slug, item.qty + 1)}
                               aria-label={`Increase quantity of ${item.name}`}
                               style={{
-                                width: '1.75rem',
-                                height: '1.75rem',
+                                width: '2.75rem',
+                                height: '2.75rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -358,7 +358,7 @@ export default function CartDrawer() {
                               background: 'none',
                               border: 'none',
                               cursor: 'pointer',
-                              padding: 0,
+                              padding: '0.375rem 0',
                               fontFamily: 'var(--font-body)',
                               fontSize: '0.625rem',
                               fontWeight: 600,

@@ -108,7 +108,7 @@ export default function SearchOverlay({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '0.5rem',
+              padding: '0.625rem',
               color: 'var(--color-text-secondary)',
               transition: 'color 0.3s ease',
             }}

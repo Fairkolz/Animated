@@ -146,7 +146,7 @@ export default function Proof() {
       style={{ backgroundColor: 'var(--color-surface-surface)' }}
     >
       {/* Left column - cinematic portrait */}
-      <figure className="relative w-full md:w-1/2 h-[512px] md:h-auto overflow-hidden m-0">
+      <figure className="relative w-full md:w-1/2 h-[clamp(320px,60vw,512px)] md:h-auto overflow-hidden m-0">
         <motion.div
           className="absolute inset-0"
           initial={prefersReduced ? false : { scale: 1.08 }}
