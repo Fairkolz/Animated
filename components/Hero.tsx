@@ -10,7 +10,21 @@ gsap.registerPlugin(ScrollTrigger)
 
 const TOTAL_FRAMES = 120
 const FRAME_PATH = '/hero-sequence/frame-'
-const SCROLL_MULTIPLIER = 4
+// Total pinned scroll = SCROLL_MULTIPLIER viewport heights. Reduced from 4 -> 2.5
+// so each scroll input travels further through the 120-frame sequence, which is
+// what makes chapter advances feel responsive (the frame count itself is untouched).
+const SCROLL_MULTIPLIER = 2.5
+// The canvas buffer is sized at RENDER_SCALE * CSS size * devicePixelRatio so the
+// Ken Burns CSS transform (scale 1.15 -> 1.0) never upscales a smaller buffer.
+// Without this, the canvas was re-rasterized ~1.15x larger than its pixels on
+// every high-DPI display, adding avoidable softness on top of source limits.
+const RENDER_SCALE = 1.15
+// Horizontal position (fraction of frame width) of the product in the source
+// frames: ~0.62 at frame 0 drifting to ~0.50 by frame 119 (measured per-frame).
+// Used to anchor the cover-crop window so the jar stays in frame when the canvas
+// aspect is much narrower than the 16:9 source (mobile/tablet).
+const SUBJECT_TRACK_START = 0.62
+const SUBJECT_TRACK_END = 0.5
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max)
@@ -84,22 +98,22 @@ export default function Hero() {
   }, [])
 
   const updateOverlays = useCallback((p: number) => {
-    // Ch1 — visible at start, exits 0.12 → 0.22
-    applyChapter(ch1EyebrowRef.current, resolveChapter(p, -0.01, 0, 0.12, 0.22))
-    applyChapter(ch1HeadlineRef.current, resolveChapter(p, -0.01, 0, 0.12, 0.22))
-    applyChapter(ch1SubtextRef.current, resolveChapter(p, -0.01, 0, 0.12, 0.22))
-    applyChapter(ch1CtaRef.current, resolveChapter(p, -0.01, 0, 0.12, 0.22))
+    // Ch1 — visible at start, exits 0.10 → 0.18
+    applyChapter(ch1EyebrowRef.current, resolveChapter(p, -0.01, 0, 0.10, 0.18))
+    applyChapter(ch1HeadlineRef.current, resolveChapter(p, -0.01, 0, 0.10, 0.18))
+    applyChapter(ch1SubtextRef.current, resolveChapter(p, -0.01, 0, 0.10, 0.18))
+    applyChapter(ch1CtaRef.current, resolveChapter(p, -0.01, 0, 0.10, 0.18))
 
-    // Ch2 — enters 0.18, exits 0.48 → 0.58
-    applyChapter(ch2LabelRef.current, resolveChapter(p, 0.18, 0.26, 0.48, 0.58))
-    applyChapter(ch2HeadlineRef.current, resolveChapter(p, 0.20, 0.28, 0.48, 0.58))
-    applyChapter(ch2BodyRef.current, resolveChapter(p, 0.22, 0.30, 0.48, 0.58))
-    applyChapter(ch2CtaRef.current, resolveChapter(p, 0.24, 0.32, 0.48, 0.58))
+    // Ch2 — enters 0.14, exits 0.38 → 0.50
+    applyChapter(ch2LabelRef.current, resolveChapter(p, 0.14, 0.22, 0.38, 0.50))
+    applyChapter(ch2HeadlineRef.current, resolveChapter(p, 0.16, 0.24, 0.38, 0.50))
+    applyChapter(ch2BodyRef.current, resolveChapter(p, 0.18, 0.26, 0.38, 0.50))
+    applyChapter(ch2CtaRef.current, resolveChapter(p, 0.20, 0.28, 0.38, 0.50))
 
-    // Ch3 — enters 0.52, holds through end (no exit)
-    applyChapter(ch3HeadlineRef.current, resolveChapter(p, 0.52, 0.62, 1.01, 1.01))
-    applyChapter(ch3BodyRef.current, resolveChapter(p, 0.55, 0.65, 1.01, 1.01))
-    applyChapter(ch3CtaRef.current, resolveChapter(p, 0.58, 0.68, 1.01, 1.01))
+    // Ch3 — enters 0.48, holds through end (no exit)
+    applyChapter(ch3HeadlineRef.current, resolveChapter(p, 0.48, 0.56, 1.01, 1.01))
+    applyChapter(ch3BodyRef.current, resolveChapter(p, 0.51, 0.59, 1.01, 1.01))
+    applyChapter(ch3CtaRef.current, resolveChapter(p, 0.54, 0.62, 1.01, 1.01))
 
     if (scrollIndicatorRef.current) {
       const ind = clamp(1 - p * 5, 0, 1)
@@ -128,29 +142,52 @@ export default function Hero() {
     if (!imgA) return
 
     const dpr = window.devicePixelRatio || 1
-    const dw = canvas.width / dpr
-    const dh = canvas.height / dpr
+    const dw = canvas.width / (dpr * RENDER_SCALE)
+    const dh = canvas.height / (dpr * RENDER_SCALE)
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    const drawImg = (img: HTMLImageElement) => {
+    // The product drifts from right-of-center toward center across the sequence;
+    // anchor the crop on it so it never leaves the frame on narrow viewports.
+    const frac = clamp(exactFrame / (TOTAL_FRAMES - 1), 0, 1)
+    const focalPct = SUBJECT_TRACK_START + (SUBJECT_TRACK_END - SUBJECT_TRACK_START) * frac
+    const focalX = focalPct * imgA.width
+
+    const cropWindow = (img: HTMLImageElement) => {
       const ia = img.width / img.height
       const ca = dw / dh
-      let sw: number, sh: number, sx = 0, sy = 0
       if (ia > ca) {
-        sh = img.height; sw = img.height * ca; sx = (img.width - sw) / 2
-      } else {
-        sw = img.width; sh = img.width / ca; sy = (img.height - sh) / 2
+        const sh = img.height
+        const sw = img.height * ca
+        // Wide canvas — crop window is near full width, keep it centered.
+        if (sw / img.width >= 0.85) {
+          return { sx: (img.width - sw) / 2, sy: 0, sw, sh }
+        }
+        // Narrow canvas — blend toward the product focal anchor so the jar
+        // stays in frame instead of being cut by a blindly centered crop.
+        const weight = clamp(((img.width - sw) / img.width - 0.15) / 0.25, 0, 1)
+        const centered = (img.width - sw) / 2
+        const anchored = focalX - sw / 2
+        const sx = clamp(centered + (anchored - centered) * weight, 0, img.width - sw)
+        return { sx, sy: 0, sw, sh }
       }
-      ctx.imageSmoothingEnabled = true
-      ctx.imageSmoothingQuality = 'high'
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, dw, dh)
+      const sw = img.width
+      const sh = img.width / ca
+      return { sx: 0, sy: (img.height - sh) / 2, sw, sh }
     }
 
-    drawImg(imgA)
+    const windowA = cropWindow(imgA)
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+
+    const drawImg = (img: HTMLImageElement, win: { sx: number; sy: number; sw: number; sh: number }) => {
+      ctx.drawImage(img, win.sx, win.sy, win.sw, win.sh, 0, 0, dw, dh)
+    }
+
+    drawImg(imgA, windowA)
     if (imgB && blend > 0.01) {
       ctx.globalAlpha = blend
-      drawImg(imgB)
+      drawImg(imgB, windowA)
       ctx.globalAlpha = 1
     }
   }, [])
@@ -161,13 +198,14 @@ export default function Hero() {
     if (!canvas || !stage) return
     const dpr = window.devicePixelRatio || 1
     const rect = stage.getBoundingClientRect()
-    canvas.width = rect.width * dpr
-    canvas.height = rect.height * dpr
+    canvas.width = Math.max(1, Math.round(rect.width * dpr * RENDER_SCALE))
+    canvas.height = Math.max(1, Math.round(rect.height * dpr * RENDER_SCALE))
     canvas.style.width = `${rect.width}px`
     canvas.style.height = `${rect.height}px`
     const ctx = canvas.getContext('2d')
     if (ctx) {
-      ctx.scale(dpr, dpr)
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.scale(dpr * RENDER_SCALE, dpr * RENDER_SCALE)
       ctx.imageSmoothingEnabled = true
       ctx.imageSmoothingQuality = 'high'
       ctxRef.current = ctx
@@ -243,7 +281,7 @@ export default function Hero() {
       trigger: sectionRef.current,
       start: 'top top',
       end: () => `+=${window.innerHeight * SCROLL_MULTIPLIER}`,
-      scrub: 0.3,
+      scrub: 0.15,
       pin: wrapperRef.current,
       anticipatePin: 1,
       onUpdate: (self) => {
