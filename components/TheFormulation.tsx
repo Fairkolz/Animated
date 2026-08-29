@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 
 /* Section-scoped aliases mapped onto the global dark token system
    (hero world: deep charcoal / champagne gold / amber). */
@@ -69,36 +69,19 @@ const calloutPlacement: Record<string, CSSProperties> = {
   'bottom-right': { bottom: 48, right: 96, textAlign: 'left' },
 }
 
-/* Percent-based placement for the mobile ring's four labels. They share the
-   diagram box rather than OVERFLOWING it (desktop uses absolute-percentage
-   callouts inside a fixed scaled stage); this keeps the rotating rings from
-   ever crossing the section heading or list text on small screens. */
-const ringLabelPlacement: Record<string, CSSProperties> = {
-  'top-left': { top: '3%', left: '2%', textAlign: 'left' },
-  'top-right': { top: '3%', right: '2%', textAlign: 'right' },
-  'bottom-left': { bottom: '6%', left: '2%', textAlign: 'left' },
-  'bottom-right': { bottom: '6%', right: '2%', textAlign: 'right' },
-}
-
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 function DiagramFigure({
   prefersReduced,
   circleWidth,
   imageClassName,
-  figureClassName = '',
-  labels,
 }: {
   prefersReduced: boolean | null
   circleWidth: number | string
   imageClassName: string
-  figureClassName?: string
-  labels?: ReactNode
 }) {
   return (
-    <figure
-      className={`relative z-10 m-0 flex flex-col items-center ${figureClassName}`}
-    >
+    <figure className="relative z-10 m-0 flex flex-col items-center">
       <div
         className="absolute pointer-events-none"
         style={{
@@ -131,11 +114,6 @@ function DiagramFigure({
           <rect x="52" y="397" width="6" height="6" fill="var(--gold-deep)" />
           <rect x="742" y="397" width="6" height="6" fill="var(--gold-deep)" />
         </motion.svg>
-        {labels && (
-          <div className="absolute" style={{ inset: 0 }}>
-            {labels}
-          </div>
-        )}
       </div>
       <motion.div
         animate={prefersReduced ? undefined : { y: [0, -10, 0] }}
@@ -344,53 +322,18 @@ export default function TheFormulation() {
           </div>
         </div>
 
-        {/* Tablet/mobile: self-contained diagram. The ring fills the stage box
-            (never bleeding into the heading above or the list below) and the
-            four principle labels are pinned to the ring's corners so they
-            remain visible — mirroring the desktop callouts. */}
+        {/* Tablet/mobile: simplified, self-contained diagram without corner
+            labels. The ring and bottle stay centered with generous whitespace
+            so the composition breathes instead of being squeezed into a
+            cramped box; the full principle text lives in the list below. */}
         <div
           aria-label="Formulation principles diagram"
-          className="relative lg:hidden mx-auto"
-          style={{
-            width: 'min(78vw, 30rem)',
-            height: 'calc(min(78vw, 30rem) * 1.24)',
-            overflow: 'hidden',
-          }}
+          className="relative min-h-[560px] lg:hidden flex items-start justify-center overflow-hidden"
         >
           <DiagramFigure
             prefersReduced={prefersReduced}
-            circleWidth="100%"
-            figureClassName="h-full w-full justify-center"
-            imageClassName="w-[min(40vw,11rem)] mt-8"
-            labels={
-              principles.map((p, i) => (
-                <motion.div
-                  key={p.index}
-                  className="absolute"
-                  style={{
-                    width: '44%',
-                    ...ringLabelPlacement[p.corner],
-                  }}
-                  initial={prefersReduced ? false : { opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.7, delay: i * 0.1, ease: easeStandard }}
-                >
-                  <p
-                    className="italic text-sm mb-1.5"
-                    style={{ fontFamily: 'var(--font-display)', color: 'var(--ink-muted)' }}
-                  >
-                    N&deg;{p.index}
-                  </p>
-                  <h3
-                    className="text-xl leading-tight"
-                    style={{ fontFamily: 'var(--font-display)', fontWeight: 400, color: 'var(--ink)' }}
-                  >
-                    {p.title}
-                  </h3>
-                </motion.div>
-              ))
-            }
+            circleWidth="min(150vw, 900px)"
+            imageClassName="w-[min(72vw,320px)] md:w-[min(38vw,420px)]"
           />
         </div>
 
