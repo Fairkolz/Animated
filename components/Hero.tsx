@@ -14,6 +14,10 @@ const FRAME_PATH = '/hero-sequence/frame-'
 // so each scroll input travels further through the 120-frame sequence, which is
 // what makes chapter advances feel responsive (the frame count itself is untouched).
 const SCROLL_MULTIPLIER = 2.5
+// On touch phones the hero still felt like it needed "twice the scroll"; shrink the
+// pinned distance and scrub latency there so one flick advances roughly a chapter.
+const MOBILE_SCROLL_MULTIPLIER = 1.8
+const MOBILE_SCRUB = 0.1
 // The canvas buffer is sized at RENDER_SCALE * CSS size * devicePixelRatio so the
 // Ken Burns CSS transform (scale 1.15 -> 1.0) never upscales a smaller buffer.
 // Without this, the canvas was re-rasterized ~1.15x larger than its pixels on
@@ -25,6 +29,62 @@ const RENDER_SCALE = 1.15
 // aspect is much narrower than the 16:9 source (mobile/tablet).
 const SUBJECT_TRACK_START = 0.62
 const SUBJECT_TRACK_END = 0.5
+
+// The 120 source frames are ~1672x940 JPEGs that read a touch soft when shown
+// full-screen. Each frame is sharpened ONCE at decode time (luma unsharp mask
+// applied to the decoded pixels) and stored as a canvas, so the per-frame draw
+// stays cheap and browser support needs nothing beyond Canvas 2D.
+const SHARPEN_STRENGTH = 1.0
+
+type FrameSource = HTMLImageElement | HTMLCanvasElement
+
+function sharpenFrame(img: HTMLImageElement): FrameSource {
+  const w = img.naturalWidth
+  const h = img.naturalHeight
+  const cv = document.createElement('canvas')
+  cv.width = w
+  cv.height = h
+  const c2d = cv.getContext('2d', { willReadFrequently: true })
+  if (!c2d) return img
+  c2d.drawImage(img, 0, 0)
+  const imageData = c2d.getImageData(0, 0, w, h)
+  const d = imageData.data
+  const n = w * h
+
+  const lum = new Float32Array(n)
+  for (let i = 0, p = 0; i < n; i++, p += 4) {
+    lum[i] = 0.299 * d[p] + 0.587 * d[p + 1] + 0.114 * d[p + 2]
+  }
+
+  // Two-pass [1,2,1] blur for a soft ~1px luma base.
+  const tmp = new Float32Array(n)
+  for (let y = 0; y < h; y++) {
+    const row = y * w
+    tmp[row] = lum[row]
+    for (let x = 1; x < w - 1; x++) {
+      const i = row + x
+      tmp[i] = (lum[i - 1] + 2 * lum[i] + lum[i + 1]) * 0.25
+    }
+    tmp[row + w - 1] = lum[row + w - 1]
+  }
+  const blur = new Float32Array(n)
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x
+      blur[i] =
+        (tmp[i - w] + 2 * tmp[i] + tmp[i + w]) * 0.25
+    }
+  }
+
+  for (let i = 0, p = 0; i < n; i++, p += 4) {
+    const delta = SHARPEN_STRENGTH * (lum[i] - blur[i])
+    d[p] = clamp(Math.round(d[p] + delta), 0, 255)
+    d[p + 1] = clamp(Math.round(d[p + 1] + delta), 0, 255)
+    d[p + 2] = clamp(Math.round(d[p + 2] + delta), 0, 255)
+  }
+  c2d.putImageData(imageData, 0, 0)
+  return cv
+}
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max)
@@ -60,7 +120,7 @@ export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const imagesRef = useRef<Map<number, HTMLImageElement>>(new Map())
+  const imagesRef = useRef<Map<number, FrameSource>>(new Map())
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const rafRef = useRef(0)
   const progressRef = useRef(0)
@@ -153,7 +213,7 @@ export default function Hero() {
     const focalPct = SUBJECT_TRACK_START + (SUBJECT_TRACK_END - SUBJECT_TRACK_START) * frac
     const focalX = focalPct * imgA.width
 
-    const cropWindow = (img: HTMLImageElement) => {
+    const cropWindow = (img: FrameSource) => {
       const ia = img.width / img.height
       const ca = dw / dh
       if (ia > ca) {
@@ -180,13 +240,16 @@ export default function Hero() {
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
 
-    const drawImg = (img: HTMLImageElement, win: { sx: number; sy: number; sw: number; sh: number }) => {
+    const drawImg = (img: FrameSource, win: { sx: number; sy: number; sw: number; sh: number }) => {
       ctx.drawImage(img, win.sx, win.sy, win.sw, win.sh, 0, 0, dw, dh)
     }
 
     drawImg(imgA, windowA)
     if (imgB && blend > 0.01) {
-      ctx.globalAlpha = blend
+      // Smootherstep the blend so the cross-dissolve spends less time at the
+      // washed-out mid point (blend 0.5), reducing ghosting/judder while scrubbing.
+      const b = blend * blend * (3 - 2 * blend)
+      ctx.globalAlpha = b
       drawImg(imgB, windowA)
       ctx.globalAlpha = 1
     }
@@ -224,7 +287,7 @@ export default function Hero() {
       const idx = i
       const img = new Image()
       img.onload = () => {
-        imagesRef.current.set(idx, img)
+        imagesRef.current.set(idx, sharpenFrame(img))
         loadedCountRef.current++
         if (!firstLoaded && idx === 0) {
           firstLoaded = true
@@ -248,6 +311,8 @@ export default function Hero() {
     if (isLoading || !sectionRef.current) return
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isMobile = window.matchMedia('(max-width: 767px)').matches && navigator.maxTouchPoints > 0
+    const scrollMult = isMobile ? MOBILE_SCROLL_MULTIPLIER : SCROLL_MULTIPLIER
 
     // Chapter 1 entrance — staggered fade-in on load
     if (!prefersReduced) {
@@ -280,8 +345,8 @@ export default function Hero() {
     const st = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: 'top top',
-      end: () => `+=${window.innerHeight * SCROLL_MULTIPLIER}`,
-      scrub: 0.15,
+      end: () => `+=${window.innerHeight * scrollMult}`,
+      scrub: isMobile ? MOBILE_SCRUB : 0.15,
       pin: wrapperRef.current,
       anticipatePin: 1,
       onUpdate: (self) => {
