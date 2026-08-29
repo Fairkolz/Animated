@@ -322,21 +322,9 @@ export default function TheFormulation() {
           </div>
         </div>
 
-        {/* Tablet/mobile: simplified, self-contained diagram without corner
-            labels. The ring and bottle stay centered with generous whitespace
-            so the composition breathes instead of being squeezed into a
-            cramped box; the full principle text lives in the list below. */}
-        <div
-          aria-label="Formulation principles diagram"
-          className="relative min-h-[560px] lg:hidden flex items-start justify-center overflow-hidden"
-        >
-          <DiagramFigure
-            prefersReduced={prefersReduced}
-            circleWidth="min(150vw, 900px)"
-            imageClassName="w-[min(72vw,320px)] md:w-[min(38vw,420px)]"
-          />
-        </div>
-
+        {/* Tablet/mobile: the circular diagram is desktop-only. On smaller
+            screens the four principles read as a clean linear list below —
+            showing both would overlap illegibly and add noise. */}
         <ol className="lg:hidden w-full max-w-xl mx-auto mt-16 list-none border-t" style={{ borderColor: 'var(--hairline)' }}>
           {principles.map((p, i) => (
             <motion.li

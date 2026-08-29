@@ -23,12 +23,16 @@ const MOBILE_SCRUB = 0.1
 // Without this, the canvas was re-rasterized ~1.15x larger than its pixels on
 // every high-DPI display, adding avoidable softness on top of source limits.
 const RENDER_SCALE = 1.15
-// Horizontal position (fraction of frame width) of the product in the source
-// frames: ~0.62 at frame 0 drifting to ~0.50 by frame 119 (measured per-frame).
-// Used to anchor the cover-crop window so the jar stays in frame when the canvas
-// aspect is much narrower than the 16:9 source (mobile/tablet).
-const SUBJECT_TRACK_START = 0.62
-const SUBJECT_TRACK_END = 0.5
+// On narrow canvases (mobile/tablet) the cover-crop window shows only a small
+// vertical slice of the 16:9 source. If we center that slice on the product's
+// DRIFTING centroid (0.62 -> 0.49 across the sequence) the jar's label — whose
+// RIGHT edge measures a stable ~0.70 of frame width in the frames — gets cut by
+// the window's right edge near the end of the scroll, hiding the "AUVÉRER
+// RENEWAL" text. So instead we pin the crop window's RIGHT edge to a fixed
+// anchor just past the label, which keeps the label in frame at every scroll
+// position. Desktop (wide canvas) is unaffected: it uses a centered near-full
+// width crop.
+const LABEL_RIGHT_ANCHOR = 0.74
 
 // The 120 source frames are ~1672x940 JPEGs that read a touch soft when shown
 // full-screen. Each frame is sharpened ONCE at decode time (luma unsharp mask
@@ -207,12 +211,6 @@ export default function Hero() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // The product drifts from right-of-center toward center across the sequence;
-    // anchor the crop on it so it never leaves the frame on narrow viewports.
-    const frac = clamp(exactFrame / (TOTAL_FRAMES - 1), 0, 1)
-    const focalPct = SUBJECT_TRACK_START + (SUBJECT_TRACK_END - SUBJECT_TRACK_START) * frac
-    const focalX = focalPct * imgA.width
-
     const cropWindow = (img: FrameSource) => {
       const ia = img.width / img.height
       const ca = dw / dh
@@ -223,12 +221,10 @@ export default function Hero() {
         if (sw / img.width >= 0.85) {
           return { sx: (img.width - sw) / 2, sy: 0, sw, sh }
         }
-        // Narrow canvas — blend toward the product focal anchor so the jar
-        // stays in frame instead of being cut by a blindly centered crop.
-        const weight = clamp(((img.width - sw) / img.width - 0.15) / 0.25, 0, 1)
-        const centered = (img.width - sw) / 2
-        const anchored = focalX - sw / 2
-        const sx = clamp(centered + (anchored - centered) * weight, 0, img.width - sw)
+        // Narrow canvas — pin the window's RIGHT edge to the label anchor so
+        // the jar's "AUVÉRER RENEWAL" label stays in frame instead of being
+        // cut when the product's centroid drifts left over the sequence.
+        const sx = clamp(LABEL_RIGHT_ANCHOR * img.width - sw, 0, img.width - sw)
         return { sx, sy: 0, sw, sh }
       }
       const sw = img.width

@@ -39,6 +39,48 @@ function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
   )
 }
 
+function CarouselControl({
+  direction,
+  onClick,
+  label,
+}: {
+  direction: 'left' | 'right'
+  onClick: () => void
+  label: string
+}) {
+  const right = direction === 'right'
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      style={{
+        width: '2.5rem',
+        height: '2.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: right ? '1px solid var(--color-accent-gold)' : '1px solid var(--color-border-strong)',
+        backgroundColor: 'color-mix(in srgb, var(--color-brand-primary) 55%, transparent)',
+        color: right ? 'var(--color-accent-gold)' : 'var(--color-text-secondary)',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--color-accent-gold)'
+        e.currentTarget.style.color = 'var(--color-accent-gold)'
+        e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = right ? 'var(--color-accent-gold)' : 'var(--color-border-strong)'
+        e.currentTarget.style.color = right ? 'var(--color-accent-gold)' : 'var(--color-text-secondary)'
+        e.currentTarget.style.backgroundColor = 'transparent'
+      }}
+    >
+      <ChevronIcon direction={direction} />
+    </button>
+  )
+}
+
 export default function TheCollection() {
   const [offset, setOffset] = useState(0)
   const prefersReduced = useReducedMotion()
@@ -142,7 +184,7 @@ export default function TheCollection() {
           style={{ alignItems: 'stretch' }}
         >
           {/* Featured card */}
-          <article className="md:col-span-5">
+          <article className="md:col-span-5" style={{ position: 'relative' }}>
             <Link
               href={`/collections/${featured.slug}`}
               aria-label={`${featured.name} — ${formatPrice(featured.price)}`}
@@ -245,70 +287,42 @@ export default function TheCollection() {
                 </span>
               </div>
             </Link>
+
+            {/* Mobile prev/next — overlaid on the featured card so they are
+                visually anchored to the carousel instead of floating orphaned
+                between cards. md:hidden hides them on desktop where the header
+                controls take over. */}
+            <div className="md:hidden" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', zIndex: 20 }}>
+              <CarouselControl
+                direction="left"
+                onClick={() => setOffset((o) => o - 1)}
+                label="Previous products"
+              />
+            </div>
+            <div className="md:hidden" style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', zIndex: 20 }}>
+              <CarouselControl
+                direction="right"
+                onClick={() => setOffset((o) => o + 1)}
+                label="Next products"
+              />
+            </div>
           </article>
 
           {/* Right cluster */}
           <div className="md:col-span-7" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {/* Carousel controls */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-              }}
-            >
+            {/* Carousel controls — desktop: header row above the cards */}
+            <div className="hidden md:flex" style={{ justifyContent: 'flex-end' }}>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button
+                <CarouselControl
+                  direction="left"
                   onClick={() => setOffset((o) => o - 1)}
-                  aria-label="Previous products"
-                  style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid var(--color-border-strong)',
-                    backgroundColor: 'transparent',
-                    color: 'var(--color-text-secondary)',
-                    cursor: 'pointer',
-                    transition: 'border-color 0.3s ease, color 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-accent-gold)'
-                    e.currentTarget.style.color = 'var(--color-accent-gold)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-border-strong)'
-                    e.currentTarget.style.color = 'var(--color-text-secondary)'
-                  }}
-                >
-                  <ChevronIcon direction="left" />
-                </button>
-                <button
+                  label="Previous products"
+                />
+                <CarouselControl
+                  direction="right"
                   onClick={() => setOffset((o) => o + 1)}
-                  aria-label="Next products"
-                  style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid var(--color-accent-gold)',
-                    backgroundColor: 'transparent',
-                    color: 'var(--color-accent-gold)',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.3s ease, color 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
-                    e.currentTarget.style.color = 'var(--color-brand-primary)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                    e.currentTarget.style.color = 'var(--color-accent-gold)'
-                  }}
-                >
-                  <ChevronIcon direction="right" />
-                </button>
+                  label="Next products"
+                />
               </div>
             </div>
 
