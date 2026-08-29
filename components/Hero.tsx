@@ -24,10 +24,13 @@ const MOBILE_SCRUB = 0.1
 // every high-DPI display, adding avoidable softness on top of source limits.
 const RENDER_SCALE = 1.15
 // Horizontal position (fraction of frame width) of the product in the source
-// frames: ~0.62 at frame 0 drifting to ~0.50 by frame 119 (measured per-frame).
+// frames: ~0.57 at frame 0 drifting to ~0.50 by frame 119. The luminance-weighted
+// product centroid sits closer to 0.57 at the opening frames (the original 0.62
+// was pulled right by wide scene highlights, so the cream was framed right of
+// center / clipped on the left edge of narrow mobile crops).
 // Used to anchor the cover-crop window so the jar stays in frame when the canvas
 // aspect is much narrower than the 16:9 source (mobile/tablet).
-const SUBJECT_TRACK_START = 0.62
+const SUBJECT_TRACK_START = 0.57
 const SUBJECT_TRACK_END = 0.5
 
 // The 120 source frames are ~1672x940 JPEGs that read a touch soft when shown
