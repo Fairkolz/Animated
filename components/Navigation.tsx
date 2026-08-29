@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
@@ -20,6 +21,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { itemCount, openBag } = useBag()
   const prefersReduced = useReducedMotion()
   const navRef = useRef<HTMLElement>(null)
@@ -50,6 +52,10 @@ export default function Navigation() {
       closeButtonRef.current.focus()
     }
   }, [mobileOpen])
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (mobileOpen) {
@@ -268,131 +274,135 @@ export default function Navigation() {
       </nav>
 
       {/* Mobile menu overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="nav-mobile-overlay"
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 49,
-              background: 'rgba(10, 10, 10, 0.96)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2.5rem',
-            }}
-          >
-            {navLinks.map((link, i) => (
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {mobileOpen && (
               <motion.div
-                key={link.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4, delay: i * 0.07 }}
-              >
-                <Link
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
-                    letterSpacing: '0.12em',
-                    fontWeight: 300,
-                    color: 'var(--color-text-inverse)',
-                    textDecoration: 'none',
-                    transition: 'color 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
-                >
-                  {link.label}
-                </Link>
-              </motion.div>
-            ))}
-            <div style={{
-              display: 'flex',
-              gap: '2rem',
-              marginTop: '1.5rem',
-            }}>
-              <button
-                type="button"
-                aria-label="Search"
-                aria-haspopup="dialog"
-                onClick={() => {
-                  setMobileOpen(false)
-                  setSearchOpen(true)
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="nav-mobile-overlay"
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.625rem',
-                  color: 'var(--color-text-inverse)',
-                  transition: 'color 0.3s ease',
+                  position: 'fixed',
+                  inset: 0,
+                  zIndex: 49,
+                  background: 'rgba(10, 10, 10, 0.96)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2.5rem',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
               >
-                <Search size={22} strokeWidth={1.5} />
-              </button>
-              <button
-                type="button"
-                aria-label={`Shopping bag${itemCount > 0 ? `, ${itemCount} item${itemCount === 1 ? '' : 's'}` : ', empty'}`}
-                aria-haspopup="dialog"
-                onClick={() => {
-                  setMobileOpen(false)
-                  openBag()
-                }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.625rem',
-                  color: 'var(--color-text-inverse)',
-                  position: 'relative',
-                  transition: 'color 0.3s ease',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
-              >
-                <ShoppingBag size={22} strokeWidth={1.5} />
-                {itemCount > 0 && (
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      top: '-2px',
-                      right: '-2px',
-                      minWidth: '14px',
-                      height: '14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 3px',
-                      borderRadius: 'var(--radius-pill)',
-                      backgroundColor: 'var(--color-accent-gold)',
-                      color: 'var(--color-brand-primary)',
-                      fontFamily: 'var(--font-body)',
-                      fontSize: '0.5625rem',
-                      fontWeight: 700,
-                    }}
+                {navLinks.map((link, i) => (
+                  <motion.div
+                    key={link.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4, delay: i * 0.07 }}
                   >
-                    {itemCount}
-                  </span>
-                )}
-              </button>
-            </div>
-          </motion.div>
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
+                        letterSpacing: '0.12em',
+                        fontWeight: 300,
+                        color: 'var(--color-text-inverse)',
+                        textDecoration: 'none',
+                        transition: 'color 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+                <div style={{
+                  display: 'flex',
+                  gap: '2rem',
+                  marginTop: '1.5rem',
+                }}>
+                  <button
+                    type="button"
+                    aria-label="Search"
+                    aria-haspopup="dialog"
+                    onClick={() => {
+                      setMobileOpen(false)
+                      setSearchOpen(true)
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0.625rem',
+                      color: 'var(--color-text-inverse)',
+                      transition: 'color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                  >
+                    <Search size={22} strokeWidth={1.5} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Shopping bag${itemCount > 0 ? `, ${itemCount} item${itemCount === 1 ? '' : 's'}` : ', empty'}`}
+                    aria-haspopup="dialog"
+                    onClick={() => {
+                      setMobileOpen(false)
+                      openBag()
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0.625rem',
+                      color: 'var(--color-text-inverse)',
+                      position: 'relative',
+                      transition: 'color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                  >
+                    <ShoppingBag size={22} strokeWidth={1.5} />
+                    {itemCount > 0 && (
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          top: '-2px',
+                          right: '-2px',
+                          minWidth: '14px',
+                          height: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '0 3px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: 'var(--color-accent-gold)',
+                          color: 'var(--color-brand-primary)',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.5625rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {itemCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
 
       {/* Overlays */}
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />

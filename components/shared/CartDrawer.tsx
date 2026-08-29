@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
@@ -13,8 +14,13 @@ const EASE: [number, number, number, number] = [0.22, 0.61, 0.36, 1]
 export default function CartDrawer() {
   const { items, itemCount, subtotal, removeItem, setQty, isDrawerOpen, closeBag } = useBag()
   const prefersReduced = useReducedMotion()
+  const [mounted, setMounted] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const lastFocusedRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!isDrawerOpen) return
@@ -34,8 +40,11 @@ export default function CartDrawer() {
   }, [isDrawerOpen, closeBag])
 
   return (
-    <AnimatePresence>
-      {isDrawerOpen && (
+    <>
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {isDrawerOpen && (
         <>
           <motion.div
             initial={prefersReduced ? { opacity: 1 } : { opacity: 0 }}
@@ -479,7 +488,10 @@ export default function CartDrawer() {
             )}
           </motion.aside>
         </>
-      )}
-    </AnimatePresence>
+          )}
+          </AnimatePresence>,
+          document.body,
+        )}
+    </>
   )
 }

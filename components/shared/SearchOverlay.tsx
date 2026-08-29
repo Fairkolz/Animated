@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { products } from '../../lib/products'
@@ -36,8 +37,13 @@ export default function SearchOverlay({
 }) {
   const prefersReduced = useReducedMotion()
   const [query, setQuery] = useState('')
+  const [mounted, setMounted] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const lastFocusedRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
@@ -73,8 +79,11 @@ export default function SearchOverlay({
   }, [results])
 
   return (
-    <AnimatePresence>
-      {isOpen && (
+    <>
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen && (
         <motion.div
           role="dialog"
           aria-modal="true"
@@ -258,7 +267,10 @@ export default function SearchOverlay({
             </div>
           </motion.div>
         </motion.div>
-      )}
-    </AnimatePresence>
+          )}
+          </AnimatePresence>,
+          document.body,
+        )}
+    </>
   )
 }
