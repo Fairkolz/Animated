@@ -458,13 +458,11 @@ export default function Hero() {
         </div>
 
         {/* ===== CHAPTER 1 — THE ART ===== */}
-        <div className="absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none">
-          <div
-            className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto"
-            style={{
-              background: 'linear-gradient(to right, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.5) 60%, transparent 100%)',
-            }}
-          >
+        <div
+          className="absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none"
+          style={{ background: 'linear-gradient(to right, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.5) 60%, transparent 100%)' }}
+        >
+          <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <p
                 ref={ch1EyebrowRef}

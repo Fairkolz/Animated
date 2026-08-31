@@ -204,7 +204,7 @@ export default function TheCollection() {
                   the larger header controls for desktop. */}
               <div
                 className="flex md:hidden"
-                style={{ gap: '0.625rem', flexShrink: 0 }}
+                style={{ gap: '0.625rem', flexShrink: 0, marginLeft: 'auto' }}
               >
                 <CarouselControl
                   direction="left"
