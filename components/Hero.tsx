@@ -78,16 +78,19 @@ export default function Hero() {
   const loadingRef = useRef(true)
   const initialFailuresRef = useRef(0)
 
+  const ch1ContainerRef = useRef<HTMLDivElement>(null)
   const ch1EyebrowRef = useRef<HTMLParagraphElement>(null)
   const ch1HeadlineRef = useRef<HTMLHeadingElement>(null)
   const ch1SubtextRef = useRef<HTMLParagraphElement>(null)
   const ch1CtaRef = useRef<HTMLButtonElement>(null)
 
+  const ch2ContainerRef = useRef<HTMLDivElement>(null)
   const ch2LabelRef = useRef<HTMLParagraphElement>(null)
   const ch2HeadlineRef = useRef<HTMLHeadingElement>(null)
   const ch2BodyRef = useRef<HTMLParagraphElement>(null)
   const ch2CtaRef = useRef<HTMLButtonElement>(null)
 
+  const ch3ContainerRef = useRef<HTMLDivElement>(null)
   const ch3HeadlineRef = useRef<HTMLHeadingElement>(null)
   const ch3BodyRef = useRef<HTMLParagraphElement>(null)
   const ch3CtaRef = useRef<HTMLButtonElement>(null)
@@ -109,7 +112,28 @@ export default function Hero() {
     el.style.transform = `translateY(${v.y}px)`
   }, [])
 
+  // Each chapter is also a full-height absolute overlay stacked at the same
+  // z-index. Even when a chapter's content is invisible (opacity 0), its wide
+  // `pointer-events-auto` wrapper would sit on top of the chapters below it and
+  // swallow their hover/click events. Toggling `pointer-events` on each
+  // chapter container by scroll progress ensures only the visible chapter is
+  // interactive — this is what makes the chapter CTA hover and click work.
+  const setChapterInteractive = useCallback((
+    ref: { current: HTMLDivElement | null },
+    active: boolean,
+  ) => {
+    if (ref.current) ref.current.style.pointerEvents = active ? 'auto' : 'none'
+  }, [])
+
   const updateOverlays = useCallback((p: number) => {
+    // Toggle interactivity per chapter based on its scroll window:
+    // Ch1 visible from load (p=0) through its exit 0.18
+    // Ch2 enters 0.14, exits 0.38 → 0.50
+    // Ch3 enters 0.48, holds to the end
+    setChapterInteractive(ch1ContainerRef, p < 0.19)
+    setChapterInteractive(ch2ContainerRef, p >= 0.12 && p <= 0.51)
+    setChapterInteractive(ch3ContainerRef, p >= 0.46)
+
     // Ch1 — visible at start, exits 0.10 → 0.18
     applyChapter(ch1EyebrowRef.current, resolveChapter(p, -0.01, 0, 0.10, 0.18))
     applyChapter(ch1HeadlineRef.current, resolveChapter(p, -0.01, 0, 0.10, 0.18))
@@ -137,7 +161,7 @@ export default function Hero() {
     }
 
     motionProgress.set(p)
-  }, [applyChapter, motionProgress])
+  }, [applyChapter, motionProgress, setChapterInteractive])
 
   const frameSrc = useCallback((index: number) => {
     return `${FRAME_BASE}${String(index + 1).padStart(4, '0')}.jpg`
@@ -461,7 +485,9 @@ export default function Hero() {
 
         {/* ===== CHAPTER 1 — THE ART ===== */}
         <div
+          ref={ch1ContainerRef}
           className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none"
+          style={{ pointerEvents: 'auto' }}
         >
           <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
@@ -555,7 +581,7 @@ export default function Hero() {
         </div>
 
         {/* ===== CHAPTER 2 — PHILOSOPHY ===== */}
-        <div className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
+        <div ref={ch2ContainerRef} className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
           <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <p
@@ -643,7 +669,7 @@ export default function Hero() {
         </div>
 
         {/* ===== CHAPTER 3 — FINAL STATE ===== */}
-        <div className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
+        <div ref={ch3ContainerRef} className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
           <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <h2
