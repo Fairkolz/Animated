@@ -489,7 +489,7 @@ export default function Hero() {
           className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none"
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
+          <div className="w-full px-8 md:px-16 lg:px-24">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <p
                 ref={ch1EyebrowRef}
@@ -582,7 +582,7 @@ export default function Hero() {
 
         {/* ===== CHAPTER 2 — PHILOSOPHY ===== */}
         <div ref={ch2ContainerRef} className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
-          <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
+          <div className="w-full px-8 md:px-16 lg:px-24">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <p
                 ref={ch2LabelRef}
@@ -670,7 +670,7 @@ export default function Hero() {
 
         {/* ===== CHAPTER 3 — FINAL STATE ===== */}
         <div ref={ch3ContainerRef} className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
-          <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
+          <div className="w-full px-8 md:px-16 lg:px-24">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <h2
                 ref={ch3HeadlineRef}
