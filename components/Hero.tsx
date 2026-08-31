@@ -455,7 +455,7 @@ export default function Hero() {
           style={{
             background: `radial-gradient(ellipse at 22% 45%, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0) 62%),
               linear-gradient(to right, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.38) 45%, rgba(10,10,10,0.16) 100%),
-              linear-gradient(to top, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 42%)`,
+              linear-gradient(to top, rgba(10,10,10,0.22) 0%, rgba(10,10,10,0) 20%)`,
           }}
         />
 
