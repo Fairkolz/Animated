@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useMotionValue, useTransform, useSpring } from 'motion/react'
-import { useRouter } from 'next/navigation'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -67,7 +66,6 @@ function resolveChapter(
 }
 
 export default function Hero() {
-  const router = useRouter()
   const sectionRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -422,15 +420,19 @@ export default function Hero() {
           />
         </div>
 
-        {/* Readability overlays */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true"
-          style={{ background: 'radial-gradient(ellipse at 25% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%)' }}
-        />
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true"
-          style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, transparent 55%)' }}
-        />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none" aria-hidden="true"
-          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45), transparent)' }}
+        {/* Single continuous cinematic overlay — covers the full hero edge to
+            edge at every breakpoint so no boundary is ever visible. The left
+            stays darker for the chapter copy while the right stays lighter to
+            keep the cream/product imagery visible. One layer scales with the
+            hero height; there is no per-chapter or fixed-height overlay. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background: `radial-gradient(ellipse at 22% 45%, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0) 62%),
+              linear-gradient(to right, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.38) 45%, rgba(10,10,10,0.16) 100%),
+              linear-gradient(to top, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 42%)`,
+          }}
         />
 
         {/* Loading */}
@@ -459,8 +461,7 @@ export default function Hero() {
 
         {/* ===== CHAPTER 1 — THE ART ===== */}
         <div
-          className="absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none"
-          style={{ background: 'linear-gradient(to right, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.5) 60%, transparent 100%)' }}
+          className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none"
         >
           <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
@@ -489,7 +490,7 @@ export default function Hero() {
                   fontSize: 'clamp(2.5rem, 6vw, 5.5rem)',
                   letterSpacing: '-0.01em',
                   fontWeight: 300,
-                  lineHeight: 1.05,
+                  lineHeight: 1.18,
                   marginBottom: 'clamp(1.5rem, 3vw, 2.5rem)',
                   opacity: 0,
                   transform: 'translateY(30px)',
@@ -525,7 +526,7 @@ export default function Hero() {
               <motion.button
                 ref={ch1CtaRef}
                 aria-label="Explore the collection"
-                onClick={() => router.push('/collections')}
+                onClick={() => { window.location.href = '/collections' }}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 style={{
@@ -554,7 +555,7 @@ export default function Hero() {
         </div>
 
         {/* ===== CHAPTER 2 — PHILOSOPHY ===== */}
-        <div className="absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
+        <div className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
           <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <p
@@ -581,7 +582,7 @@ export default function Hero() {
                   fontSize: 'clamp(2rem, 4.5vw, 4rem)',
                   letterSpacing: '-0.01em',
                   fontWeight: 300,
-                  lineHeight: 1.1,
+                  lineHeight: 1.18,
                   marginBottom: 'clamp(1.5rem, 3vw, 2.5rem)',
                   opacity: 0,
                   transform: 'translateY(40px)',
@@ -612,8 +613,8 @@ export default function Hero() {
               </p>
               <motion.button
                 ref={ch2CtaRef}
-                aria-label="Discover our philosophy"
-                onClick={() => router.push('/philosophy')}
+                aria-label="Read our story"
+                onClick={() => { window.location.href = '/about' }}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 style={{
@@ -642,7 +643,7 @@ export default function Hero() {
         </div>
 
         {/* ===== CHAPTER 3 — FINAL STATE ===== */}
-        <div className="absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
+        <div className="hero-chapter absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
           <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <h2
@@ -653,7 +654,7 @@ export default function Hero() {
                   fontSize: 'clamp(2.5rem, 5.5vw, 5rem)',
                   letterSpacing: '-0.01em',
                   fontWeight: 300,
-                  lineHeight: 1.05,
+                  lineHeight: 1.18,
                   marginBottom: 'clamp(1.5rem, 3vw, 2.5rem)',
                   opacity: 0,
                   transform: 'translateY(40px)',
@@ -687,7 +688,7 @@ export default function Hero() {
               <motion.button
                 ref={ch3CtaRef}
                 aria-label="Explore AUVERER"
-                onClick={() => router.push('/collections')}
+                onClick={() => { window.location.href = '/collections' }}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 style={{

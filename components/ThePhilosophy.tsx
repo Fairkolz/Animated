@@ -30,7 +30,7 @@ export default function ThePhilosophy() {
             fontFamily: 'var(--font-display)',
             fontWeight: 300,
             fontSize: 'clamp(2.25rem, 5vw, 3.5rem)',
-            lineHeight: 1.15,
+            lineHeight: 1.2,
             letterSpacing: '-0.01em',
             color: 'var(--color-text-primary)',
           }}

@@ -25,7 +25,7 @@ export default function TheRitual() {
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-                lineHeight: 1.1,
+                lineHeight: 1.2,
                 color: 'var(--color-text-primary)',
                 fontWeight: 300,
               }}

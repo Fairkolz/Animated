@@ -160,7 +160,7 @@ export default function ProductDetail({
                 fontFamily: 'var(--font-display)',
                 fontWeight: 300,
                 fontSize: 'clamp(2.25rem, 4.5vw, 3.5rem)',
-                lineHeight: 1.1,
+                lineHeight: 1.2,
                 color: 'var(--color-text-primary)',
                 marginBottom: '1rem',
               }}

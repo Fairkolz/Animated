@@ -52,41 +52,18 @@ function CarouselControl({
   size?: 'sm' | 'md'
   disabled?: boolean
 }) {
-  const right = direction === 'right'
-  const dim = size === 'sm' ? '2rem' : '2.5rem'
   const chevron = size === 'sm' ? 14 : 16
+  // Styling lives in the .carousel-control CSS class (globals.css) so that
+  // hover/active/focus are handled by the UA pseudo-classes. This avoids JS
+  // mouseleave handlers that could leave a gold hover state stuck on touch
+  // devices, and guarantees both arrows share one consistent treatment.
   return (
     <button
       onClick={() => !disabled && onClick()}
       aria-label={label}
       disabled={disabled}
       aria-disabled={disabled}
-      style={{
-        width: dim,
-        height: dim,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 0,
-        border: right ? '1px solid var(--color-accent-gold)' : '1px solid var(--color-border-strong)',
-        backgroundColor: 'color-mix(in srgb, var(--color-brand-primary) 55%, transparent)',
-        color: right ? 'var(--color-accent-gold)' : 'var(--color-text-secondary)',
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.35 : 1,
-        transition: 'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease',
-      }}
-      onMouseEnter={(e) => {
-        if (disabled) return
-        e.currentTarget.style.borderColor = 'var(--color-accent-gold)'
-        e.currentTarget.style.color = 'var(--color-accent-gold)'
-        e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
-      }}
-      onMouseLeave={(e) => {
-        if (disabled) return
-        e.currentTarget.style.borderColor = right ? 'var(--color-accent-gold)' : 'var(--color-border-strong)'
-        e.currentTarget.style.color = right ? 'var(--color-accent-gold)' : 'var(--color-text-secondary)'
-        e.currentTarget.style.backgroundColor = 'transparent'
-      }}
+      className={`carousel-control${size === 'sm' ? ' sm' : ''}`}
     >
       <ChevronIcon direction={direction} size={chevron} />
     </button>
@@ -126,7 +103,7 @@ export default function TheCollection() {
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'flex-end',
             gap: '2rem',
             marginBottom: 'clamp(3rem, 5vw, 4rem)',
           }}
@@ -152,11 +129,11 @@ export default function TheCollection() {
             </span>
             <h2
               style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(2.5rem, 5.5vw, 4.5rem)',
-                lineHeight: 1.05,
-                color: 'var(--color-text-primary)',
-                fontWeight: 300,
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.5rem, 5.5vw, 4.5rem)',
+              lineHeight: 1.2,
+              color: 'var(--color-text-primary)',
+              fontWeight: 300,
               }}
             >
               Bestsellers
@@ -199,25 +176,24 @@ export default function TheCollection() {
               >
                 From transformative serums to protective creams, each formulation is composed to restore clarity and radiance — the quiet artifacts of care.
               </p>
-              {/* Mobile prev/next — sit right-aligned next to the descriptive
-                  text rather than overlapping the product image; md:hidden keeps
-                  the larger header controls for desktop. */}
+              {/* Prev/next controls — a deliberate control group on the right
+                  of the heading row, aligned with the descriptive copy. On
+                  narrower screens the description wraps above and the controls
+                  stay right-aligned as a group. */}
               <div
-                className="flex md:hidden"
+                className="flex"
                 style={{ gap: '0.625rem', flexShrink: 0, marginLeft: 'auto' }}
               >
                 <CarouselControl
                   direction="left"
                   onClick={prev}
                   label="Previous products"
-                  size="sm"
                   disabled={!canPrev}
                 />
                 <CarouselControl
                   direction="right"
                   onClick={next}
                   label="Next products"
-                  size="sm"
                   disabled={!canNext}
                 />
               </div>
@@ -342,24 +318,6 @@ export default function TheCollection() {
 
           {/* Right cluster */}
           <div className="md:col-span-7" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {/* Carousel controls — desktop: header row above the cards */}
-            <div className="hidden md:flex" style={{ justifyContent: 'flex-end' }}>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <CarouselControl
-                  direction="left"
-                  onClick={prev}
-                  label="Previous products"
-                  disabled={!canPrev}
-                />
-                <CarouselControl
-                  direction="right"
-                  onClick={next}
-                  label="Next products"
-                  disabled={!canNext}
-                />
-              </div>
-            </div>
-
             {/* Two staggered cards */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 items-start" style={{ flexGrow: 1 }}>
               {[medium, small].map((p, i) => (

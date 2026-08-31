@@ -142,9 +142,13 @@ input:focus-visible {
 
 /* Masked line reveal — display headlines rise out of an overflow mask.
    Same observer engine as [data-reveal]; the OUTER element stays visible
-   (SSR-safe) while the INNER span carries the motion. */
+   (SSR-safe) while the INNER span carries the motion. The bottom padding
+   (+ compensating negative margin) reserves room for serif descenders so
+   letters like y, g, p and q are never clipped by the overflow mask. */
 [data-reveal='mask'] {
   overflow: hidden;
+  padding-bottom: 0.18em;
+  margin-bottom: -0.18em;
 }
 [data-reveal='mask'] > span {
   display: block;
@@ -289,6 +293,51 @@ a:focus-visible .card-zoom > * {
 .gallery-thumb:hover { border-color: var(--color-accent-gold) !important; }
 .add-to-bag:active { transform: translateY(1px); }
 
+/* Carousel controls (New Formulations) */
+/* Consistent neutral treatment for BOTH arrows; gold only appears as a
+   transient hover/focus/active interaction state handled by UA pseudo-classes,
+   so the buttons always return to their resting look after interaction. */
+.carousel-control {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.carousel-control.sm {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.carousel-control:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+@media (hover: hover) {
+  .carousel-control:hover:not(:disabled) {
+    border-color: var(--color-accent-gold);
+    color: var(--color-accent-gold);
+    background-color: color-mix(in srgb, var(--color-accent-gold) 12%, transparent);
+  }
+}
+.carousel-control:focus-visible:not(:disabled) {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+.carousel-control:active:not(:disabled) {
+  background-color: var(--color-accent-gold);
+  color: var(--color-brand-primary);
+  border-color: var(--color-accent-gold);
+}
+
 /* Navigation responsive */
 @media (min-width: 769px) {
   .nav-desktop { display: flex !important; }
@@ -301,3 +350,28 @@ a:focus-visible .card-zoom > * {
 }
 .nav-link:hover { color: var(--color-accent-gold) !important; }
 .nav-icon-btn:hover { color: var(--color-accent-gold) !important; }
+
+/* Hero chapters — short (landscape phone / small window) viewports */
+/* The hero is a fixed-height pinned scroll section. When the viewport
+   height is very short, vertically-centered chapter content is clipped
+   top and bottom. Align from the top with a safe offset and compress the
+   headline so the CTA remains reachable. */
+@media (max-height: 520px) {
+  .hero-chapter {
+    align-items: flex-start !important;
+    padding-top: clamp(2rem, 9vh, 4rem);
+  }
+  .hero-chapter > div > div {
+    padding-top: 0 !important;
+  }
+  .hero-chapter h1,
+  .hero-chapter h2 {
+    font-size: clamp(1.375rem, 4vh, 2.125rem) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .hero-chapter p {
+    font-size: clamp(0.75rem, 2.25vh, 0.9rem) !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
