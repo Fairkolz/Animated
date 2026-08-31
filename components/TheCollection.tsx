@@ -31,9 +31,9 @@ function ArrowIcon({ size = 18 }: { size?: number }) {
   )
 }
 
-function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
+function ChevronIcon({ direction, size = 16 }: { direction: 'left' | 'right'; size?: number }) {
   return (
-    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
       {direction === 'left' ? <path d="M15 5l-7 7 7 7" strokeLinecap="square" /> : <path d="M9 5l7 7-7 7" strokeLinecap="square" />}
     </svg>
   )
@@ -43,40 +43,52 @@ function CarouselControl({
   direction,
   onClick,
   label,
+  size = 'md',
+  disabled = false,
 }: {
   direction: 'left' | 'right'
   onClick: () => void
   label: string
+  size?: 'sm' | 'md'
+  disabled?: boolean
 }) {
   const right = direction === 'right'
+  const dim = size === 'sm' ? '2rem' : '2.5rem'
+  const chevron = size === 'sm' ? 14 : 16
   return (
     <button
-      onClick={onClick}
+      onClick={() => !disabled && onClick()}
       aria-label={label}
+      disabled={disabled}
+      aria-disabled={disabled}
       style={{
-        width: '2.5rem',
-        height: '2.5rem',
+        width: dim,
+        height: dim,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 0,
         border: right ? '1px solid var(--color-accent-gold)' : '1px solid var(--color-border-strong)',
         backgroundColor: 'color-mix(in srgb, var(--color-brand-primary) 55%, transparent)',
         color: right ? 'var(--color-accent-gold)' : 'var(--color-text-secondary)',
-        cursor: 'pointer',
+        cursor: disabled ? 'default' : 'pointer',
+        opacity: disabled ? 0.35 : 1,
         transition: 'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease',
       }}
       onMouseEnter={(e) => {
+        if (disabled) return
         e.currentTarget.style.borderColor = 'var(--color-accent-gold)'
         e.currentTarget.style.color = 'var(--color-accent-gold)'
         e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
       }}
       onMouseLeave={(e) => {
+        if (disabled) return
         e.currentTarget.style.borderColor = right ? 'var(--color-accent-gold)' : 'var(--color-border-strong)'
         e.currentTarget.style.color = right ? 'var(--color-accent-gold)' : 'var(--color-text-secondary)'
         e.currentTarget.style.backgroundColor = 'transparent'
       }}
     >
-      <ChevronIcon direction={direction} />
+      <ChevronIcon direction={direction} size={chevron} />
     </button>
   )
 }
@@ -86,12 +98,17 @@ export default function TheCollection() {
   const prefersReduced = useReducedMotion()
 
   const n = products.length
-  const shift = ((offset % n) + n) % n
-  const ordered = [...products.slice(shift), ...products.slice(0, shift)]
+  const maxOffset = Math.max(0, n - 3)
+  const clamped = Math.min(Math.max(offset, 0), maxOffset)
+  const canPrev = clamped > 0
+  const canNext = clamped < maxOffset
 
-  const featured = ordered[0]
-  const medium = ordered[1 % n]
-  const small = ordered[2 % n]
+  const featured = products[clamped]
+  const medium = products[clamped + 1]
+  const small = products[clamped + 2]
+
+  const prev = () => setOffset((o) => Math.max(0, o - 1))
+  const next = () => setOffset((o) => Math.min(maxOffset, o + 1))
 
   return (
     <section
@@ -160,23 +177,57 @@ export default function TheCollection() {
             >
               New Formulations
             </span>
-            <p
+            <div
               style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '1rem',
-                lineHeight: 1.8,
-                fontWeight: 300,
-                color: 'var(--color-text-secondary)',
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                gap: '1rem',
               }}
             >
-              From transformative serums to protective creams, each formulation is composed to restore clarity and radiance — the quiet artifacts of care.
-            </p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '1rem',
+                  lineHeight: 1.8,
+                  fontWeight: 300,
+                  color: 'var(--color-text-secondary)',
+                  flex: '1 1 16rem',
+                  margin: 0,
+                }}
+              >
+                From transformative serums to protective creams, each formulation is composed to restore clarity and radiance — the quiet artifacts of care.
+              </p>
+              {/* Mobile prev/next — sit right-aligned next to the descriptive
+                  text rather than overlapping the product image; md:hidden keeps
+                  the larger header controls for desktop. */}
+              <div
+                className="flex md:hidden"
+                style={{ gap: '0.625rem', flexShrink: 0 }}
+              >
+                <CarouselControl
+                  direction="left"
+                  onClick={prev}
+                  label="Previous products"
+                  size="sm"
+                  disabled={!canPrev}
+                />
+                <CarouselControl
+                  direction="right"
+                  onClick={next}
+                  label="Next products"
+                  size="sm"
+                  disabled={!canNext}
+                />
+              </div>
+            </div>
           </div>
         </motion.div>
 
         {/* Staggered product grid — remounts on page change for a quick crossfade */}
         <motion.div
-          key={shift}
+          key={clamped}
           initial={prefersReduced ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: easeStandard }}
@@ -287,25 +338,6 @@ export default function TheCollection() {
                 </span>
               </div>
             </Link>
-
-            {/* Mobile prev/next — overlaid on the featured card so they are
-                visually anchored to the carousel instead of floating orphaned
-                between cards. md:hidden hides them on desktop where the header
-                controls take over. */}
-            <div className="md:hidden" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', zIndex: 20 }}>
-              <CarouselControl
-                direction="left"
-                onClick={() => setOffset((o) => o - 1)}
-                label="Previous products"
-              />
-            </div>
-            <div className="md:hidden" style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', zIndex: 20 }}>
-              <CarouselControl
-                direction="right"
-                onClick={() => setOffset((o) => o + 1)}
-                label="Next products"
-              />
-            </div>
           </article>
 
           {/* Right cluster */}
@@ -315,13 +347,15 @@ export default function TheCollection() {
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <CarouselControl
                   direction="left"
-                  onClick={() => setOffset((o) => o - 1)}
+                  onClick={prev}
                   label="Previous products"
+                  disabled={!canPrev}
                 />
                 <CarouselControl
                   direction="right"
-                  onClick={() => setOffset((o) => o + 1)}
+                  onClick={next}
                   label="Next products"
+                  disabled={!canNext}
                 />
               </div>
             </div>

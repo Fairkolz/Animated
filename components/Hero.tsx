@@ -8,11 +8,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const TOTAL_FRAMES = 120
-const FRAME_PATH = '/hero-sequence/frame-'
-// Total pinned scroll = SCROLL_MULTIPLIER viewport heights. Reduced from 4 -> 2.5
-// so each scroll input travels further through the 120-frame sequence, which is
-// what makes chapter advances feel responsive (the frame count itself is untouched).
+// Frame sequence source. The 0831_frames set is a 1920x1080 (16:9) 217-frame
+// sequence extracted from one continuous video; the exact count is resolved at
+// runtime via /api/hero-frames so it is never hardcoded. Frames are named
+// frame_0001.jpg .. frame_XXXX.jpg and must stay in exact numerical order.
+const FRAME_BASE = '/0831_frames/frame_'
+// Total pinned scroll = SCROLL_MULTIPLIER viewport heights. Kept at 2.5 so the
+// user travels far enough to scrub the full sequence smoothly.
 const SCROLL_MULTIPLIER = 2.5
 // On touch phones the hero still felt like it needed "twice the scroll"; shrink the
 // pinned distance and scrub latency there so one flick advances roughly a chapter.
@@ -23,72 +25,18 @@ const MOBILE_SCRUB = 0.1
 // Without this, the canvas was re-rasterized ~1.15x larger than its pixels on
 // every high-DPI display, adding avoidable softness on top of source limits.
 const RENDER_SCALE = 1.15
-// On narrow canvases (mobile/tablet) the cover-crop window shows only a small
-// vertical slice of the 16:9 source. If we center that slice on the product's
-// DRIFTING centroid (0.62 -> 0.49 across the sequence) the jar's label — whose
-// RIGHT edge measures a stable ~0.70 of frame width in the frames — gets cut by
-// the window's right edge near the end of the scroll, hiding the "AUVÉRER
-// RENEWAL" text. So instead we pin the crop window's RIGHT edge to a fixed
-// anchor just past the label, which keeps the label in frame at every scroll
-// position. Desktop (wide canvas) is unaffected: it uses a centered near-full
-// width crop.
-const LABEL_RIGHT_ANCHOR = 0.74
+// Preload window. Only frames near the scrub position are fetched and kept; the
+// working set is bounded so we never hold the whole sequence's decodes in memory.
+// BEHIND is kept larger (with a wider evict cushion) so reverse scrubbing can
+// fall back onto recently-viewed frames instead of jumping to far-ahead ones.
+const PRELOAD_AHEAD = 24
+const PRELOAD_BEHIND = 16
+const EVICT_AHEAD_MARGIN = 20
+const EVICT_BEHIND_MARGIN = 28
+// Progress at which a reduced-motion user gets a static frame.
+const REDUCED_MOTION_PROGRESS = 0.85
 
-// The 120 source frames are ~1672x940 JPEGs that read a touch soft when shown
-// full-screen. Each frame is sharpened ONCE at decode time (luma unsharp mask
-// applied to the decoded pixels) and stored as a canvas, so the per-frame draw
-// stays cheap and browser support needs nothing beyond Canvas 2D.
-const SHARPEN_STRENGTH = 1.0
-
-type FrameSource = HTMLImageElement | HTMLCanvasElement
-
-function sharpenFrame(img: HTMLImageElement): FrameSource {
-  const w = img.naturalWidth
-  const h = img.naturalHeight
-  const cv = document.createElement('canvas')
-  cv.width = w
-  cv.height = h
-  const c2d = cv.getContext('2d', { willReadFrequently: true })
-  if (!c2d) return img
-  c2d.drawImage(img, 0, 0)
-  const imageData = c2d.getImageData(0, 0, w, h)
-  const d = imageData.data
-  const n = w * h
-
-  const lum = new Float32Array(n)
-  for (let i = 0, p = 0; i < n; i++, p += 4) {
-    lum[i] = 0.299 * d[p] + 0.587 * d[p + 1] + 0.114 * d[p + 2]
-  }
-
-  // Two-pass [1,2,1] blur for a soft ~1px luma base.
-  const tmp = new Float32Array(n)
-  for (let y = 0; y < h; y++) {
-    const row = y * w
-    tmp[row] = lum[row]
-    for (let x = 1; x < w - 1; x++) {
-      const i = row + x
-      tmp[i] = (lum[i - 1] + 2 * lum[i] + lum[i + 1]) * 0.25
-    }
-    tmp[row + w - 1] = lum[row + w - 1]
-  }
-  const blur = new Float32Array(n)
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const i = y * w + x
-      blur[i] =
-        (tmp[i - w] + 2 * tmp[i] + tmp[i + w]) * 0.25
-    }
-  }
-
-  for (let i = 0, p = 0; i < n; i++, p += 4) {
-    const delta = SHARPEN_STRENGTH * (lum[i] - blur[i])
-    d[p] = clamp(Math.round(d[p] + delta), 0, 255)
-    d[p + 1] = clamp(Math.round(d[p + 1] + delta), 0, 255)
-    d[p + 2] = clamp(Math.round(d[p + 2] + delta), 0, 255)
-  }
-  c2d.putImageData(imageData, 0, 0)
-  return cv
-}
+type FrameSource = HTMLImageElement
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max)
@@ -128,6 +76,9 @@ export default function Hero() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const rafRef = useRef(0)
   const progressRef = useRef(0)
+  const countRef = useRef(0)
+  const loadingRef = useRef(true)
+  const initialFailuresRef = useRef(0)
 
   const ch1EyebrowRef = useRef<HTMLParagraphElement>(null)
   const ch1HeadlineRef = useRef<HTMLHeadingElement>(null)
@@ -147,7 +98,6 @@ export default function Hero() {
   const progressBarRef = useRef<HTMLDivElement>(null)
 
   const [isLoading, setIsLoading] = useState(true)
-  const loadedCountRef = useRef(0)
 
   const motionProgress = useMotionValue(0)
   const springProgress = useSpring(motionProgress, { stiffness: 80, damping: 25, restDelta: 0.001 })
@@ -191,65 +141,117 @@ export default function Hero() {
     motionProgress.set(p)
   }, [applyChapter, motionProgress])
 
-  const drawInterpolated = useCallback((progress: number) => {
+  const frameSrc = useCallback((index: number) => {
+    return `${FRAME_BASE}${String(index + 1).padStart(4, '0')}.jpg`
+  }, [])
+
+  // Pick the frame closest to `desired` that is actually decodable. When the
+  // exact frame isn't ready yet, prefer the most recent frames BEHIND it (the
+  // frames the user is coming from), so reverse scrubbing steps back through
+  // just-seen frames instead of leaping to a far-ahead one. Forward scrubbing
+  // can fill gaps from a short reach ahead. This keeps the canvas from ever
+  // drawing a stale frame far out of sequence.
+  const resolveFrame = useCallback((desired: number): { src: FrameSource; index: number } | null => {
+    const map = imagesRef.current
+    const inPlace = map.get(desired)
+    if (inPlace && inPlace.complete && inPlace.naturalWidth > 0) {
+      return { src: inPlace, index: desired }
+    }
+    // Backward reach is generous: reversing should land on recently-viewed frames.
+    const backLimit = PRELOAD_BEHIND + EVICT_BEHIND_MARGIN + 4
+    for (let r = 1; r <= backLimit; r++) {
+      const back = map.get(desired - r)
+      if (back && back.complete && back.naturalWidth > 0) return { src: back, index: desired - r }
+    }
+    // Forward reach is short, only to smooth out fast forward gaps.
+    const aheadLimit = PRELOAD_AHEAD
+    for (let r = 1; r <= aheadLimit; r++) {
+      const ahead = map.get(desired + r)
+      if (ahead && ahead.complete && ahead.naturalWidth > 0) return { src: ahead, index: desired + r }
+    }
+    return null
+  }, [])
+
+  // Draw ONE exact frame (no crossfade, no interpolation) — the sequence must
+  // feel like a single video whose playback is driven by scroll.
+  const drawFrame = useCallback((progress: number) => {
     const canvas = canvasRef.current
     const ctx = ctxRef.current
     if (!canvas || !ctx) return
+    const total = countRef.current
+    if (total <= 0) return
 
-    const exactFrame = progress * (TOTAL_FRAMES - 1)
-    const frameA = Math.floor(exactFrame)
-    const frameB = Math.min(frameA + 1, TOTAL_FRAMES - 1)
-    const blend = exactFrame - frameA
-
-    const imgA = imagesRef.current.get(frameA)
-    const imgB = imagesRef.current.get(frameB)
-    if (!imgA) return
+    const desired = Math.round(progress * (total - 1))
+    const resolved = resolveFrame(desired)
+    if (!resolved) return
 
     const dpr = window.devicePixelRatio || 1
     const dw = canvas.width / (dpr * RENDER_SCALE)
     const dh = canvas.height / (dpr * RENDER_SCALE)
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    const cropWindow = (img: FrameSource) => {
-      const ia = img.width / img.height
-      const ca = dw / dh
-      if (ia > ca) {
-        const sh = img.height
-        const sw = img.height * ca
-        // Wide canvas — crop window is near full width, keep it centered.
-        if (sw / img.width >= 0.85) {
-          return { sx: (img.width - sw) / 2, sy: 0, sw, sh }
-        }
-        // Narrow canvas — pin the window's RIGHT edge to the label anchor so
-        // the jar's "AUVÉRER RENEWAL" label stays in frame instead of being
-        // cut when the product's centroid drifts left over the sequence.
-        const sx = clamp(LABEL_RIGHT_ANCHOR * img.width - sw, 0, img.width - sw)
-        return { sx, sy: 0, sw, sh }
-      }
-      const sw = img.width
-      const sh = img.width / ca
-      return { sx: 0, sy: (img.height - sh) / 2, sw, sh }
+    // Cover-fit the 16:9 source to the canvas while preserving aspect ratio.
+    const src = resolved.src
+    const ia = src.width / src.height
+    const ca = dw / dh
+    let sx = 0
+    let sy = 0
+    let sw = src.width
+    let sh = src.height
+    if (ia > ca) {
+      sw = src.height * ca
+      sx = (src.width - sw) / 2
+    } else {
+      sh = src.width / ca
+      sy = (src.height - sh) / 2
     }
 
-    const windowA = cropWindow(imgA)
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(src, sx, sy, sw, sh, 0, 0, dw, dh)
+  }, [resolveFrame])
 
-    const drawImg = (img: FrameSource, win: { sx: number; sy: number; sw: number; sh: number }) => {
-      ctx.drawImage(img, win.sx, win.sy, win.sw, win.sh, 0, 0, dw, dh)
+  // Progressively preload frames around the scrub position. The outside of the
+  // window is dropped from the working set to bound memory on long sessions.
+  const ensureWindow = useCallback((center: number) => {
+    const total = countRef.current
+    if (total <= 0) return
+    const start = Math.max(0, center - PRELOAD_BEHIND)
+    const end = Math.min(total - 1, center + PRELOAD_AHEAD)
+    for (let i = start; i <= end; i++) {
+      if (imagesRef.current.has(i)) continue
+      const img = new Image()
+      img.decoding = 'async'
+      img.onload = () => {
+        if (imagesRef.current.get(i) !== img) return
+        if (loadingRef.current) {
+          loadingRef.current = false
+          setIsLoading(false)
+          drawFrame(0)
+        }
+      }
+      img.onerror = () => {
+        if (imagesRef.current.get(i) === img) imagesRef.current.delete(i)
+        if (!loadingRef.current) return
+        // Only the early frames gate the loading screen; if they all fail we
+        // still release the page rather than hanging on the splash.
+        if (i <= Math.min(4, total - 1)) {
+          initialFailuresRef.current++
+          if (initialFailuresRef.current >= Math.min(5, total)) {
+            loadingRef.current = false
+            setIsLoading(false)
+          }
+        }
+      }
+      imagesRef.current.set(i, img)
+      img.src = frameSrc(i)
     }
-
-    drawImg(imgA, windowA)
-    if (imgB && blend > 0.01) {
-      // Smootherstep the blend so the cross-dissolve spends less time at the
-      // washed-out mid point (blend 0.5), reducing ghosting/judder while scrubbing.
-      const b = blend * blend * (3 - 2 * blend)
-      ctx.globalAlpha = b
-      drawImg(imgB, windowA)
-      ctx.globalAlpha = 1
-    }
-  }, [])
+    const evictBefore = center - (PRELOAD_BEHIND + EVICT_BEHIND_MARGIN)
+    const evictAfter = center + (PRELOAD_AHEAD + EVICT_AHEAD_MARGIN)
+    imagesRef.current.forEach((_img, key) => {
+      if (key < evictBefore || key > evictAfter) imagesRef.current.delete(key)
+    })
+  }, [drawFrame, frameSrc])
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -269,39 +271,46 @@ export default function Hero() {
       ctx.imageSmoothingQuality = 'high'
       ctxRef.current = ctx
     }
-    drawInterpolated(progressRef.current)
-  }, [drawInterpolated])
+    drawFrame(progressRef.current)
+  }, [drawFrame])
 
   useEffect(() => {
     resizeCanvas()
     const ro = new ResizeObserver(() => resizeCanvas())
     if (stageRef.current) ro.observe(stageRef.current)
-
-    let firstLoaded = false
-
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
-      const idx = i
-      const img = new Image()
-      img.onload = () => {
-        imagesRef.current.set(idx, sharpenFrame(img))
-        loadedCountRef.current++
-        if (!firstLoaded && idx === 0) {
-          firstLoaded = true
-          setIsLoading(false)
-          drawInterpolated(0)
-        }
-      }
-      img.onerror = () => {
-        loadedCountRef.current++
-        if (!firstLoaded && loadedCountRef.current >= 2) {
-          firstLoaded = true
-          setIsLoading(false)
-        }
-      }
-      img.src = `${FRAME_PATH}${String(idx).padStart(3, '0')}.jpg`
-    }
     return () => ro.disconnect()
-  }, [resizeCanvas, drawInterpolated])
+  }, [resizeCanvas])
+
+  // Resolve the frame count at runtime (never hardcoded), then start loading
+  // the early frames so the hero opens on frame 1.
+  useEffect(() => {
+    let cancelled = false
+    const init = async () => {
+      try {
+        const res = await fetch('/api/hero-frames')
+        if (!res.ok) throw new Error('hero-frames unavailable')
+        const data = await res.json()
+        if (cancelled) return
+        const count = Math.max(0, parseInt(data?.count, 10) || 0)
+        countRef.current = count
+        if (count > 0) {
+          ensureWindow(0)
+        } else {
+          loadingRef.current = false
+          setIsLoading(false)
+        }
+      } catch {
+        if (!cancelled) {
+          loadingRef.current = false
+          setIsLoading(false)
+        }
+      }
+    }
+    init()
+    return () => {
+      cancelled = true
+    }
+  }, [ensureWindow])
 
   useEffect(() => {
     if (isLoading || !sectionRef.current) return
@@ -332,10 +341,32 @@ export default function Hero() {
         }, 1200)
       }
     } else {
-      // Reduced motion: show everything immediately at final state
-      drawInterpolated(0.85)
-      updateOverlays(0.85)
-      return
+      // Reduced motion: show a static frame (no scroll scrubbing) at the
+      // final chapter state, waiting only until that frame has decoded.
+      const total = countRef.current
+      if (total <= 0) {
+        updateOverlays(REDUCED_MOTION_PROGRESS)
+        return
+      }
+      const targetIndex = Math.round(REDUCED_MOTION_PROGRESS * (total - 1))
+      ensureWindow(targetIndex)
+      let attempts = 0
+      const paint = () => {
+        attempts++
+        if (!resolveFrame(targetIndex)) {
+          // Failsafe: if the frames never decode, release the page anyway.
+          if (attempts < 120) {
+            rafRef.current = requestAnimationFrame(paint)
+          } else {
+            updateOverlays(REDUCED_MOTION_PROGRESS)
+          }
+          return
+        }
+        drawFrame(REDUCED_MOTION_PROGRESS)
+        updateOverlays(REDUCED_MOTION_PROGRESS)
+      }
+      rafRef.current = requestAnimationFrame(paint)
+      return () => { cancelAnimationFrame(rafRef.current) }
     }
 
     const st = ScrollTrigger.create({
@@ -351,7 +382,8 @@ export default function Hero() {
           rafRef.current = requestAnimationFrame(() => {
             rafRef.current = 0
             const p = progressRef.current
-            drawInterpolated(p)
+            drawFrame(p)
+            ensureWindow(Math.round(p * (countRef.current - 1)))
             updateOverlays(p)
           })
         }
@@ -359,7 +391,7 @@ export default function Hero() {
     })
 
     return () => { st.kill(); cancelAnimationFrame(rafRef.current) }
-  }, [isLoading, drawInterpolated, updateOverlays])
+  }, [isLoading, drawFrame, ensureWindow, resolveFrame, updateOverlays])
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -426,8 +458,13 @@ export default function Hero() {
         </div>
 
         {/* ===== CHAPTER 1 — THE ART ===== */}
-        <div className="absolute left-0 top-0 bottom-0 w-full md:w-[65%] flex items-center z-20 pointer-events-none">
-          <div className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto">
+        <div className="absolute left-0 top-0 bottom-0 w-full md:w-[50%] flex items-center z-20 pointer-events-none">
+          <div
+            className="w-full px-8 md:px-16 lg:px-24 pointer-events-auto"
+            style={{
+              background: 'linear-gradient(to right, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.5) 60%, transparent 100%)',
+            }}
+          >
             <div style={{ paddingTop: 'clamp(3rem, 8vh, 6rem)' }}>
               <p
                 ref={ch1EyebrowRef}
