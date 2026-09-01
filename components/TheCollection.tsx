@@ -92,7 +92,7 @@ export default function TheCollection() {
       aria-label="The Collection"
       style={{
         backgroundColor: 'var(--color-surface-container-low)',
-        padding: 'clamp(6rem, 10vw, 10rem) clamp(1.5rem, 4vw, 4rem)',
+        padding: 'clamp(2rem, 3vw, 3rem) clamp(1.5rem, 4vw, 4rem) clamp(6rem, 10vw, 10rem)',
         borderTop: '1px solid var(--color-border-default)',
       }}
     >
@@ -103,9 +103,9 @@ export default function TheCollection() {
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            gap: '2rem',
-            marginBottom: 'clamp(3rem, 5vw, 4rem)',
+            alignItems: 'flex-start',
+            gap: '1.5rem',
+            marginBottom: 'clamp(0.75rem, 1.5vw, 1.25rem)',
           }}
           initial={prefersReduced ? false : { opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ export default function TheCollection() {
               Bestsellers
             </h2>
           </div>
-          <div style={{ maxWidth: '28rem' }}>
+          <div style={{ maxWidth: '28rem', marginLeft: 'auto', paddingTop: '2.5rem' }}>
             <span
               style={{
                 fontFamily: 'var(--font-body)',
@@ -149,54 +149,36 @@ export default function TheCollection() {
                 textTransform: 'uppercase',
                 color: 'var(--color-text-muted)',
                 display: 'block',
-                marginBottom: '0.75rem',
+                marginBottom: '1rem',
               }}
             >
               New Formulations
             </span>
-            <div
+            <p
               style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'flex-end',
-                justifyContent: 'space-between',
-                gap: '1rem',
+                fontFamily: 'var(--font-body)',
+                fontSize: '1rem',
+                lineHeight: 1.8,
+                fontWeight: 300,
+                color: 'var(--color-text-secondary)',
+                margin: 0,
               }}
             >
-              <p
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '1rem',
-                  lineHeight: 1.8,
-                  fontWeight: 300,
-                  color: 'var(--color-text-secondary)',
-                  flex: '1 1 16rem',
-                  margin: 0,
-                }}
-              >
-                From transformative serums to protective creams, each formulation is composed to restore clarity and radiance — the quiet artifacts of care.
-              </p>
-              {/* Prev/next controls — a deliberate control group on the right
-                  of the heading row, aligned with the descriptive copy. On
-                  narrower screens the description wraps above and the controls
-                  stay right-aligned as a group. */}
-              <div
-                className="flex"
-                style={{ gap: '0.625rem', flexShrink: 0, marginLeft: 'auto' }}
-              >
-                <CarouselControl
-                  direction="left"
-                  onClick={prev}
-                  label="Previous products"
-                  disabled={!canPrev}
-                />
-                <CarouselControl
-                  direction="right"
-                  onClick={next}
-                  label="Next products"
-                  disabled={!canNext}
-                />
-              </div>
+              From transformative serums to protective creams, each formulation is composed to restore clarity and radiance — the quiet artifacts of care.
+            </p>
+            <div style={{ display: 'flex', gap: '0.625rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+              <CarouselControl
+                direction="left"
+                onClick={prev}
+                label="Previous products"
+                disabled={!canPrev}
+              />
+              <CarouselControl
+                direction="right"
+                onClick={next}
+                label="Next products"
+                disabled={!canNext}
+              />
             </div>
           </div>
         </motion.div>
@@ -298,6 +280,7 @@ export default function TheCollection() {
                   </span>
                 </div>
                 <span
+                  className="card-arrow"
                   style={{
                     width: '3rem',
                     height: '3rem',
@@ -305,9 +288,10 @@ export default function TheCollection() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid var(--color-accent-gold)',
-                    color: 'var(--color-accent-gold)',
-                    backgroundColor: 'var(--color-surface-dim)',
+                    border: '1px solid var(--color-border-strong)',
+                    color: 'var(--color-text-inverse)',
+                    backgroundColor: 'transparent',
+                    pointerEvents: 'auto',
                   }}
                 >
                   <ArrowIcon />
@@ -323,7 +307,7 @@ export default function TheCollection() {
               {[medium, small].map((p, i) => (
                 <motion.article
                   key={p.slug}
-                  className={i === 1 ? 'sm:self-end md:mt-12' : ''}
+                  className={i === 0 ? 'sm:self-end md:mt-20' : 'sm:self-end md:mt-32'}
                   initial={prefersReduced ? false : { opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -401,6 +385,7 @@ export default function TheCollection() {
                         </span>
                       </div>
                       <span
+                        className="card-arrow"
                         style={{
                           width: '2.5rem',
                           height: '2.5rem',
@@ -411,6 +396,7 @@ export default function TheCollection() {
                           border: '1px solid var(--color-border-strong)',
                           color: 'var(--color-text-inverse)',
                           backgroundColor: 'transparent',
+                          pointerEvents: 'auto',
                         }}
                       >
                         <ArrowIcon size={16} />

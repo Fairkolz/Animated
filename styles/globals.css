@@ -215,13 +215,22 @@ input:focus-visible {
   transform: translateX(420%) skewX(-18deg);
 }
 
-/* Boxed arrow inside product cards — nudges toward the link */
+/* Boxed arrow inside product cards — nudges toward the link and turns gold on hover */
 .card-arrow {
-  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    color 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 a:hover .card-arrow,
-a:focus-visible .card-arrow {
+a:focus-visible .card-arrow,
+.card-arrow:hover,
+.card-arrow:focus-visible {
   transform: translateX(6px);
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+  background-color: color-mix(in srgb, var(--color-accent-gold) 14%, transparent);
 }
 
 /* Product card image zoom on hover */
