@@ -6,18 +6,37 @@
 import { motion, useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getArticle, type Article } from '../lib/articles'
+import type { Article } from '../lib/articles'
 import { articleImage } from '../lib/images'
 
-const FEATURED_SLUGS = [
-  'in-praise-of-the-unhurried-morning',
-  'sourcing-the-extraordinary',
-  'minimalism-as-a-skincare-philosophy',
+type FeaturedArticle = Pick<Article, 'slug' | 'title' | 'category' | 'excerpt'>
+
+/* Homepage teaser cards only need slugs, titles and brief metadata — the full
+   essay bodies live on their route pages. Hardcoding the three picks here (with
+   a runtime guard against drift) keeps the 9 full essay bodies out of the home
+   page bundle, which previously imported the entire articles module. */
+const FEATURED: { slug: string; title: string; category: FeaturedArticle['category']; excerpt: string }[] = [
+  {
+    slug: 'in-praise-of-the-unhurried-morning',
+    title: 'In Praise of the Unhurried Morning',
+    category: 'Ritual',
+    excerpt: 'A defence of the ninety seconds nobody can take from you, practiced before the world wakes.',
+  },
+  {
+    slug: 'sourcing-the-extraordinary',
+    title: 'Sourcing the Extraordinary',
+    category: 'Ingredients',
+    excerpt: 'White truffle, alpine water and the long conversations behind every raw material we accept.',
+  },
+  {
+    slug: 'minimalism-as-a-skincare-philosophy',
+    title: 'Minimalism as a Skincare Philosophy',
+    category: 'Living',
+    excerpt: 'Why your vanity, and your complexion, thrive on less but better.',
+  },
 ]
 
-const articles = FEATURED_SLUGS.map((slug) => getArticle(slug)).filter(
-  (a): a is Article => Boolean(a),
-)
+const articles: FeaturedArticle[] = FEATURED
 
 export default function JournalPreview() {
   const prefersReduced = useReducedMotion()

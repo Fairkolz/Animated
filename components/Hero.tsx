@@ -7,10 +7,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Frame sequence source. The 0831_frames set is a 1920x1080 (16:9) 217-frame
-// sequence extracted from one continuous video; the exact count is resolved at
-// runtime via /api/hero-frames so it is never hardcoded. Frames are named
-// frame_0001.jpg .. frame_XXXX.jpg and must stay in exact numerical order.
+// Frame sequence source. The 0831_frames set is a 1280x720 (16:9) WebP
+// sequence extracted from one continuous video (converted from 1920x1080 to
+// cut payload ~4x); the exact count is resolved at runtime via /api/hero-frames
+// so it is never hardcoded. Frames are named frame_0001.webp .. frame_XXXX.webp
+// and must stay in exact numerical order.
 const FRAME_BASE = '/0831_frames/frame_'
 // Total pinned scroll = SCROLL_MULTIPLIER viewport heights. Kept at 2.5 so the
 // user travels far enough to scrub the full sequence smoothly.
@@ -164,7 +165,7 @@ export default function Hero() {
   }, [applyChapter, motionProgress, setChapterInteractive])
 
   const frameSrc = useCallback((index: number) => {
-    return `${FRAME_BASE}${String(index + 1).padStart(4, '0')}.jpg`
+    return `${FRAME_BASE}${String(index + 1).padStart(4, '0')}.webp`
   }, [])
 
   // Pick the frame closest to `desired` that is actually decodable. When the
@@ -235,11 +236,19 @@ export default function Hero() {
 
   // Progressively preload frames around the scrub position. The outside of the
   // window is dropped from the working set to bound memory on long sessions.
-  const ensureWindow = useCallback((center: number) => {
+  // Callers can narrow the window (radius) for low-bandwidth intents: opening
+  // the hero needs only a few frames, and a reduced-motion user needs exactly
+  // one, so neither should pull the full 40-frame window.
+  const ensureWindow = useCallback((
+    center: number,
+    radius?: { ahead?: number; behind?: number },
+  ) => {
     const total = countRef.current
     if (total <= 0) return
-    const start = Math.max(0, center - PRELOAD_BEHIND)
-    const end = Math.min(total - 1, center + PRELOAD_AHEAD)
+    const ahead = radius?.ahead ?? PRELOAD_AHEAD
+    const behind = radius?.behind ?? PRELOAD_BEHIND
+    const start = Math.max(0, center - behind)
+    const end = Math.min(total - 1, center + ahead)
     for (let i = start; i <= end; i++) {
       if (imagesRef.current.has(i)) continue
       const img = new Image()
@@ -268,8 +277,8 @@ export default function Hero() {
       imagesRef.current.set(i, img)
       img.src = frameSrc(i)
     }
-    const evictBefore = center - (PRELOAD_BEHIND + EVICT_BEHIND_MARGIN)
-    const evictAfter = center + (PRELOAD_AHEAD + EVICT_AHEAD_MARGIN)
+    const evictBefore = center - (behind + EVICT_BEHIND_MARGIN)
+    const evictAfter = center + (ahead + EVICT_AHEAD_MARGIN)
     imagesRef.current.forEach((_img, key) => {
       if (key < evictBefore || key > evictAfter) imagesRef.current.delete(key)
     })
@@ -316,7 +325,11 @@ export default function Hero() {
         const count = Math.max(0, parseInt(data?.count, 10) || 0)
         countRef.current = count
         if (count > 0) {
-          ensureWindow(0)
+          // Only seed the frames the opening shot needs; the scroll-driven
+          // window fills in the rest as the user scrubs. Loading the full
+          // 24-ahead window up front wasted ~5 MB on visitors who never
+          // scrub that far.
+          ensureWindow(0, { ahead: 5 })
         } else {
           loadingRef.current = false
           setIsLoading(false)
@@ -371,7 +384,8 @@ export default function Hero() {
         return
       }
       const targetIndex = Math.round(REDUCED_MOTION_PROGRESS * (total - 1))
-      ensureWindow(targetIndex)
+      // A single static frame — no need to pull the whole window around it.
+      ensureWindow(targetIndex, { ahead: 1, behind: 1 })
       let attempts = 0
       const paint = () => {
         attempts++

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, memo } from 'react'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'motion/react'
 import { homeImage } from '../lib/images'
@@ -39,48 +39,23 @@ const statsData: StatItem[] = [
 
 const easeStandard: [number, number, number, number] = [0.22, 0.61, 0.36, 1]
 
-function useCountUp(target: number, isActive: boolean, duration = 2000): number {
-  const [current, setCurrent] = useState(0)
-  const rafRef = useRef<number>(0)
-
-  useEffect(() => {
-    if (!isActive) return
-    const start = performance.now()
-    const animate = (now: number) => {
-      const elapsed = now - start
-      const progress = Math.min(elapsed / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setCurrent(Math.round(eased * target))
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(animate)
-      }
-    }
-    rafRef.current = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(rafRef.current)
-  }, [isActive, target, duration])
-
-  return current
-}
-
-function StatCell({
+const StatCell = memo(function StatCell({
   stat,
   index,
-  isVisible,
+  displayed,
   prefersReduced,
 }: {
   stat: StatItem
   index: number
-  isVisible: boolean
+  displayed: number
   prefersReduced: boolean | null
 }) {
-  const animatedValue = useCountUp(stat.value, isVisible, 2200)
-  const displayValue = prefersReduced ? stat.value : isVisible ? animatedValue : 0
-
   return (
     <motion.li
       className="relative pt-6"
       initial={prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-      animate={isVisible ? { opacity: 1, y: 0 } : undefined}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       transition={{ duration: 0.9, delay: index * 0.12, ease: easeStandard }}
     >
       <span
@@ -93,7 +68,7 @@ function StatCell({
         style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-primary)' }}
       >
         <span className="font-light leading-none" style={{ fontSize: 'clamp(4rem, 8vw, 6rem)' }}>
-          {displayValue}
+          {displayed}
         </span>
         <span
           className={`font-light ml-1 ${stat.suffixItalic ? 'italic' : ''}`}
@@ -113,12 +88,13 @@ function StatCell({
       </p>
     </motion.li>
   )
-}
+})
 
 export default function Proof() {
   const prefersReduced = useReducedMotion()
   const statsRef = useRef<HTMLUListElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [displayed, setDisplayed] = useState<number[]>(() => statsData.map(() => 0))
 
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     if (entries[0].isIntersecting) {
@@ -128,6 +104,7 @@ export default function Proof() {
 
   useEffect(() => {
     if (prefersReduced) {
+      setDisplayed(statsData.map((s) => s.value))
       setIsVisible(true)
       return
     }
@@ -138,6 +115,27 @@ export default function Proof() {
       if (el) observer.unobserve(el)
     }
   }, [prefersReduced, handleIntersection])
+
+  /* Single rAF loop drives all four counters from one setState call per frame,
+     so the section re-renders once per frame instead of four StatCells each
+     owning their own loop (a 4x state churn on mid-tier devices). Every update
+     is a replace with equal elements and the memoized cells only recompute
+     their number text. */
+  useEffect(() => {
+    if (!isVisible || prefersReduced) return
+    const start = performance.now()
+    const duration = 2200
+    let raf = 0
+    const animate = (now: number) => {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplayed(statsData.map((s) => Math.round(eased * s.value)))
+      if (progress < 1) raf = requestAnimationFrame(animate)
+    }
+    raf = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(raf)
+  }, [isVisible, prefersReduced])
 
   return (
     <section
@@ -203,7 +201,7 @@ export default function Proof() {
                 key={`${stat.value}${stat.suffix}`}
                 stat={stat}
                 index={i}
-                isVisible={isVisible}
+                displayed={displayed[i]}
                 prefersReduced={prefersReduced}
               />
             ))}

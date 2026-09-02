@@ -1,8 +1,3 @@
-'use client'
-
-import { useEffect } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navigation from '../components/Navigation'
 import Hero from '../components/Hero'
 import TheBelief from '../components/TheBelief'
@@ -16,14 +11,7 @@ import JournalPreview from '../components/JournalPreview'
 import TheInvitation from '../components/TheInvitation'
 import Footer from '../components/Footer'
 
-gsap.registerPlugin(ScrollTrigger)
-
 export default function Home() {
-  useEffect(() => {
-    ScrollTrigger.refresh()
-    return () => {}
-  }, [])
-
   return (
     <main>
       <Navigation />

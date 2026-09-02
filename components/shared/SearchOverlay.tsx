@@ -4,29 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { products } from '../../lib/products'
-import { articles } from '../../lib/articles'
+import { SEARCH_INDEX } from '../../lib/search-index'
 
 const EASE: [number, number, number, number] = [0.22, 0.61, 0.36, 1]
-
-type SearchResult = {
-  title: string
-  meta: string
-  href: string
-}
-
-const INDEX: SearchResult[] = [
-  ...products.map((p) => ({
-    title: p.name,
-    meta: 'Product — The Collection',
-    href: `/collections/${p.slug}`,
-  })),
-  ...articles.map((a) => ({
-    title: a.title,
-    meta: 'Essay — The Journal',
-    href: `/journal/${a.slug}`,
-  })),
-]
 
 export default function SearchOverlay({
   isOpen,
@@ -67,16 +47,16 @@ export default function SearchOverlay({
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
-    return INDEX.filter(
-      (entry) => entry.title.toLowerCase().includes(q) || entry.meta.toLowerCase().includes(q)
+    return SEARCH_INDEX.filter(
+      (entry) =>
+        entry.title.toLowerCase().includes(q) ||
+        entry.meta.toLowerCase().includes(q) ||
+        (entry.keywords ? entry.keywords.toLowerCase().includes(q) : false)
     ).slice(0, 8)
   }, [query])
 
-  /* Deduplicate by href (the explicit Auric entry overrides the slugified one). */
-  const uniqueResults = useMemo(() => {
-    const seen = new Set<string>()
-    return results.filter((r) => !seen.has(r.href) && seen.add(r.href))
-  }, [results])
+  /* Each index href is unique, so results need no post-hoc deduplication. */
+  const uniqueResults = results
 
   return (
     <>

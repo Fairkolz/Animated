@@ -65,6 +65,10 @@ export default function Trust() {
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGiEaHkfvvn7-r37gs_W2q-sRytPUQMjqBEcttPgxoEwFHp3hTOsLt4aZzO5kV9p1SrLTTP8eJ8Gk11hbeMfDNtX-wChlkwVjWYZL5VNoo4Fb7vgA1qf0X48pwIQe6CuEnDXCUE7-QGljwZv1R7Cd8EvhNo00Zcp7a3-7dnnicl1wvtoEI0DK2k7qtJ7MXarJNqDrIYfY8BawKBaKAnGTPW3PYqnxok49eXjBG2frZ7-6OSQfnVdSb"
               alt="Elena Vance portrait"
+              loading="lazy"
+              decoding="async"
+              width={56}
+              height={56}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>

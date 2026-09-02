@@ -78,6 +78,10 @@ export default function TheRitual() {
               <img
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbdH7SbQKf9225iBoztpBBjrgMEyvjx8ePvxEIsg8YaRvElqwxO5x42N8vZRkNBCEhqrVAbWexsw7d32JcPyMGvY_C-mfCcEEWYlI7CcJisBE8fWasoNjlOQVpta8dqOkEXjtGYl95sYZOwjCafsDsV3R8r0SBcX6MXCXE9OJtI8YD6woIDApiLJ7nJkrPQp1pwyAs97cka6IRyLaQWkwy6L7xrcI3rNEeNDManv4p4ake7hoP7bL7"
                   alt="Cleansing the face at a dimly lit basin, preparation step of the ritual"
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={1000}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
@@ -112,6 +116,10 @@ export default function TheRitual() {
                 <img
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvh6LIAOSY3oJZvU3TMr7C60WP3jYlq4rBbnMaxj2I2_pRQExBHj_ZZR6-8DmrXEpTxCfjYDxuTDQ4To5prUWaim9Rg6YY1Us16mjuGCynqKY93V7tyqyEB31FDY4WMPlQYN6yfTtYQQkL5wfnpHDdu22S0C313vrA3hsukQKDfOqxrnLazfR9RwzkoOeD-taSiuP9GSc8pKNAOD6PURx0LObszVlblWDduKC_Tz5T6kyOSiqAXXhF"
                   alt="Auvérer serum concentrate bottle dispensing the infusion step of the ritual"
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={500}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
@@ -144,6 +152,10 @@ export default function TheRitual() {
                 <img
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdPCmX-MgBiDLtrKP0bH65rJRUbsEtbCeOyN0JMGMSDk8CZxdou65kznH5wfBrvlF3ewBVrUubMOFDnCSCDt0rRlHmUFBkIxiqRm448DRwKm_59o8TKeXrKL1HqET5JXuDqvjpfCNFZNa4w0_YzcFLQ39bL46L1wqBpXh-0LNZE8t7r3_xka5ulk6SHl0kPfvytKRVXs7b75Uo4r6vpsyX0OJF3B_i47cTy-pb1qNdbIY5Sj8XcksE"
                   alt="Hands applying the final balm, culmination of the ritual"
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={500}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>

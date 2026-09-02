@@ -1,14 +1,25 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useBag } from './shared/BagProvider'
-import SearchOverlay from './shared/SearchOverlay'
-import CartDrawer from './shared/CartDrawer'
+
+/* Overlays are only needed once the user opens them, and each pulls a weighty
+   runtime (full-screen Motion + the product/journal datasets). Lazy-loading
+   them keeps them out of the initial route bundle on every page. */
+const SearchOverlay = dynamic(() => import('./shared/SearchOverlay'), {
+  ssr: false,
+  loading: () => null,
+})
+const CartDrawer = dynamic(() => import('./shared/CartDrawer'), {
+  ssr: false,
+  loading: () => null,
+})
 
 const navLinks = [
   { label: 'Collections', href: '/collections' },
