@@ -403,7 +403,9 @@ export default function Navigation() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '2.5rem',
+                  gap: 'clamp(1.25rem, 5vh, 2.5rem)',
+                  padding: '3rem 1.5rem',
+                  overflowY: 'auto',
                 }}
               >
                 {navLinks.map((link, i) => (
@@ -433,119 +435,17 @@ export default function Navigation() {
                     </Link>
                   </motion.div>
                 ))}
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '2rem',
-                  width: 'min(21rem, 100%)',
-                  marginTop: '1.5rem',
-                }}>
-                  {/* Utility icons — search and bag (plus account when signed in) */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '2.75rem' }}>
-                    {status === 'authed' && (
-                      <button
-                        type="button"
-                        aria-label="Account"
-                        aria-haspopup="dialog"
-                        onClick={() => {
-                          setMobileOpen(false)
-                          openAuth()
-                        }}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: '0.625rem',
-                          color: 'var(--color-text-inverse)',
-                          transition: 'color 0.3s ease',
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
-                      >
-                        <User size={22} strokeWidth={1.5} />
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      aria-label="Search"
-                      aria-haspopup="dialog"
-                      onClick={() => {
-                        setMobileOpen(false)
-                        setSearchOpen(true)
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '0.625rem',
-                        color: 'var(--color-text-inverse)',
-                        transition: 'color 0.3s ease',
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                {/* Account — styled like the primary menu links so the menu
+                    reads as one continuous list. */}
+                {status === 'guest' && (
+                  <>
+                    <motion.div
+                      key="auth-signin"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.4, delay: navLinks.length * 0.07 }}
                     >
-                      <Search size={22} strokeWidth={1.5} />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`Shopping bag${itemCount > 0 ? `, ${itemCount} item${itemCount === 1 ? '' : 's'}` : ', empty'}`}
-                      aria-haspopup="dialog"
-                      onClick={() => {
-                        setMobileOpen(false)
-                        openBag()
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '0.625rem',
-                        color: 'var(--color-text-inverse)',
-                        position: 'relative',
-                        transition: 'color 0.3s ease',
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
-                    >
-                      <ShoppingBag size={22} strokeWidth={1.5} />
-                      {itemCount > 0 && (
-                        <span
-                          aria-hidden="true"
-                          style={{
-                            position: 'absolute',
-                            top: '-2px',
-                            right: '-2px',
-                            minWidth: '14px',
-                            height: '14px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: '0 3px',
-                            borderRadius: 'var(--radius-pill)',
-                            backgroundColor: 'var(--color-accent-gold)',
-                            color: 'var(--color-brand-primary)',
-                            fontFamily: 'var(--font-body)',
-                            fontSize: '0.5625rem',
-                            fontWeight: 700,
-                          }}
-                        >
-                          {itemCount}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Auth actions — separated by a hairline so they read as a
-                      distinct "account" group rather than a cramped icon row. */}
-                  {status === 'guest' && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.875rem',
-                      width: '100%',
-                      paddingTop: '1.75rem',
-                      borderTop: '1px solid rgba(246, 243, 237, 0.12)',
-                    }}>
                       <button
                         type="button"
                         onClick={() => {
@@ -553,16 +453,15 @@ export default function Navigation() {
                           openAuth('signin')
                         }}
                         style={{
-                          flex: 1,
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          padding: '0.75rem 0',
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.75rem',
-                          letterSpacing: '0.2em',
-                          textTransform: 'uppercase',
-                          fontWeight: 500,
+                          padding: '0.25rem 0',
+                          fontFamily: 'var(--font-display)',
+                          fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
+                          letterSpacing: '0.12em',
+                          fontWeight: 300,
+                          textTransform: 'none',
                           color: 'var(--color-text-inverse)',
                           transition: 'color 0.3s ease',
                         }}
@@ -571,6 +470,14 @@ export default function Navigation() {
                       >
                         Sign In
                       </button>
+                    </motion.div>
+                    <motion.div
+                      key="auth-signup"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.4, delay: (navLinks.length + 1) * 0.07 }}
+                    >
                       <button
                         type="button"
                         onClick={() => {
@@ -578,34 +485,34 @@ export default function Navigation() {
                           openAuth('register')
                         }}
                         style={{
-                          flex: 1.3,
-                          background: 'transparent',
-                          border: '1px solid var(--color-accent-gold)',
+                          background: 'none',
+                          border: 'none',
                           cursor: 'pointer',
-                          padding: '0.75rem 1.25rem',
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.75rem',
-                          letterSpacing: '0.2em',
-                          textTransform: 'uppercase',
-                          fontWeight: 600,
-                          color: 'var(--color-text-inverse)',
-                          borderRadius: 0,
-                          transition: 'background-color 0.3s ease, color 0.3s ease',
+                          padding: '0.25rem 0',
+                          fontFamily: 'var(--font-display)',
+                          fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
+                          letterSpacing: '0.12em',
+                          fontWeight: 300,
+                          textTransform: 'none',
+                          color: 'var(--color-accent-gold)',
+                          transition: 'color 0.3s ease',
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
-                          e.currentTarget.style.color = 'var(--color-brand-primary)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent'
-                          e.currentTarget.style.color = 'var(--color-text-inverse)'
-                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
                       >
                         Sign Up
                       </button>
-                    </div>
-                  )}
-                  {status === 'authed' && (
+                    </motion.div>
+                  </>
+                )}
+                {status === 'authed' && (
+                  <motion.div
+                    key="auth-account"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4, delay: navLinks.length * 0.07 }}
+                  >
                     <button
                       type="button"
                       aria-haspopup="dialog"
@@ -614,32 +521,104 @@ export default function Navigation() {
                         openAuth()
                       }}
                       style={{
-                        width: '100%',
-                        background: 'transparent',
-                        border: '1px solid var(--color-accent-gold)',
+                        background: 'none',
+                        border: 'none',
                         cursor: 'pointer',
-                        padding: '0.75rem 1.25rem',
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '0.75rem',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                        fontWeight: 600,
+                        padding: '0.25rem 0',
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
+                        letterSpacing: '0.12em',
+                        fontWeight: 300,
+                        textTransform: 'none',
                         color: 'var(--color-text-inverse)',
-                        borderRadius: 0,
-                        transition: 'background-color 0.3s ease, color 0.3s ease',
+                        transition: 'color 0.3s ease',
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
-                        e.currentTarget.style.color = 'var(--color-brand-primary)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent'
-                        e.currentTarget.style.color = 'var(--color-text-inverse)'
-                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
                     >
                       View Account
                     </button>
-                  )}
+                  </motion.div>
+                )}
+
+                {/* Utility icons — search and bag, set apart by a hairline */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2.75rem',
+                  width: 'min(21rem, 100%)',
+                  marginTop: '2rem',
+                  paddingTop: '1.75rem',
+                  borderTop: '1px solid rgba(246, 243, 237, 0.12)',
+                }}>
+                  <button
+                    type="button"
+                    aria-label="Search"
+                    aria-haspopup="dialog"
+                    onClick={() => {
+                      setMobileOpen(false)
+                      setSearchOpen(true)
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0.625rem',
+                      color: 'var(--color-text-inverse)',
+                      transition: 'color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                  >
+                    <Search size={22} strokeWidth={1.5} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Shopping bag${itemCount > 0 ? `, ${itemCount} item${itemCount === 1 ? '' : 's'}` : ', empty'}`}
+                    aria-haspopup="dialog"
+                    onClick={() => {
+                      setMobileOpen(false)
+                      openBag()
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0.625rem',
+                      color: 'var(--color-text-inverse)',
+                      position: 'relative',
+                      transition: 'color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                  >
+                    <ShoppingBag size={22} strokeWidth={1.5} />
+                    {itemCount > 0 && (
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          top: '-2px',
+                          right: '-2px',
+                          minWidth: '14px',
+                          height: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '0 3px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: 'var(--color-accent-gold)',
+                          color: 'var(--color-brand-primary)',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.5625rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {itemCount}
+                      </span>
+                    )}
+                  </button>
                 </div>
               </motion.div>
             )}
