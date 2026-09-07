@@ -8,6 +8,29 @@ import type { User } from '@supabase/supabase-js'
 
 const EASE: [number, number, number, number] = [0.22, 0.61, 0.36, 1]
 
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''
+const HAS_CAPTCHA = Boolean(TURNSTILE_SITE_KEY)
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string
+          callback: (token: string) => void
+          'error-callback'?: () => void
+          'expired-callback'?: () => void
+          theme?: 'light' | 'dark' | 'auto'
+        }
+      ) => string
+      reset: (widgetId: string) => void
+      remove: (widgetId: string) => void
+    }
+    onloadTurnstileCallback?: () => void
+  }
+}
+
 type Mode = 'signin' | 'register'
 type Method = 'password' | 'magiclink'
 type Status = 'idle' | 'busy' | 'checkEmail' | 'error' | 'notice'
@@ -41,6 +64,9 @@ export default function AuthDrawer({
   const [isAdmin, setIsAdmin] = useState(false)
   const [, startTransition] = useTransition()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const captchaRef = useRef<HTMLDivElement>(null)
+  const captchaWidgetRef = useRef<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState('')
 
   useEffect(() => {
     setMounted(true)
@@ -100,6 +126,67 @@ export default function AuthDrawer({
     }
   }, [isOpen, onClose, initialMode])
 
+  const resetCaptcha = () => {
+    if (captchaWidgetRef.current && window.turnstile) {
+      window.turnstile.reset(captchaWidgetRef.current)
+    }
+    setCaptchaToken('')
+  }
+
+  useEffect(() => {
+    if (!HAS_CAPTCHA) return
+    if (status === 'checkEmail' || user || !isOpen) {
+      if (captchaWidgetRef.current && window.turnstile) {
+        window.turnstile.remove(captchaWidgetRef.current)
+        captchaWidgetRef.current = null
+      }
+      return
+    }
+    let cancelled = false
+
+    const render = () => {
+      if (cancelled || !captchaRef.current || !window.turnstile) return
+      if (captchaWidgetRef.current) {
+        window.turnstile.reset(captchaWidgetRef.current)
+        return
+      }
+      captchaWidgetRef.current = window.turnstile.render(captchaRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: 'dark',
+        callback: (token) => {
+          if (!cancelled) setCaptchaToken(token)
+        },
+        'error-callback': () => {
+          if (!cancelled) setCaptchaToken('')
+        },
+        'expired-callback': () => {
+          if (!cancelled) setCaptchaToken('')
+        },
+      })
+    }
+
+    const inject = () => {
+      if (window.turnstile) {
+        render()
+        return
+      }
+      window.onloadTurnstileCallback = render
+      const s = document.createElement('script')
+      s.src =
+        'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback&render=explicit'
+      s.async = true
+      s.setAttribute('crossorigin', 'anonymous')
+      s.onload = render
+      document.head.appendChild(s)
+    }
+
+    inject()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isOpen, user, status])
+
   const switchMode = (next: Mode) => {
     setMode(next)
     setMethod('password')
@@ -148,8 +235,15 @@ export default function AuthDrawer({
       setMessage('Your password must be at least 6 characters.')
       return
     }
+    if (HAS_CAPTCHA && !captchaToken) {
+      setStatus('error')
+      setMessage('Please complete the security check first.')
+      return
+    }
+    const passedToken = captchaToken
     setStatus('busy')
     setMessage('')
+    resetCaptcha()
 
     startTransition(async () => {
       const supabase = getSupabase()
@@ -157,7 +251,10 @@ export default function AuthDrawer({
         if (mode === 'signin' && method === 'magiclink') {
           const { error } = await supabase.auth.signInWithOtp({
             email: cleanEmail,
-            options: { emailRedirectTo: window.location.origin },
+            options: {
+              emailRedirectTo: window.location.origin,
+              captchaToken: passedToken,
+            },
           })
           if (error) {
             setStatus('error')
@@ -172,6 +269,7 @@ export default function AuthDrawer({
           const { error } = await supabase.auth.signInWithPassword({
             email: cleanEmail,
             password,
+            options: { captchaToken: passedToken },
           })
           if (error) {
             setStatus('error')
@@ -183,7 +281,10 @@ export default function AuthDrawer({
           const { error } = await supabase.auth.signUp({
             email: cleanEmail,
             password,
-            options: { emailRedirectTo: window.location.origin },
+            options: {
+              emailRedirectTo: window.location.origin,
+              captchaToken: passedToken,
+            },
           })
           if (error) {
             setStatus('error')
@@ -206,12 +307,20 @@ export default function AuthDrawer({
       setMessage('Enter your email address so we can send you a reset link.')
       return
     }
+    if (HAS_CAPTCHA && !captchaToken) {
+      setStatus('error')
+      setMessage('Please complete the security check first.')
+      return
+    }
+    const passedToken = captchaToken
     setStatus('busy')
     setMessage('')
+    resetCaptcha()
     startTransition(async () => {
       try {
         const { error } = await getSupabase().auth.resetPasswordForEmail(cleanEmail, {
           redirectTo: window.location.origin,
+          captchaToken: passedToken,
         })
         if (error) {
           setStatus('error')
@@ -733,6 +842,13 @@ export default function AuthDrawer({
                               >
                                 {message}
                               </p>
+                            )}
+
+                            {HAS_CAPTCHA && (
+                              <div
+                                ref={captchaRef}
+                                style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                              />
                             )}
 
                             <button

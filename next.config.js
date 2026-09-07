@@ -8,14 +8,15 @@ const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : ''
 
 const ContentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
   "font-src 'self' https://fonts.gstatic.com data:",
-  "img-src 'self' data: blob: https://lh3.googleusercontent.com",
+  "img-src 'self' data: blob: https://lh3.googleusercontent.com https://challenges.cloudflare.com",
   [
     "connect-src 'self'",
     'https://fonts.googleapis.com',
     'https://fonts.gstatic.com',
+    'https://challenges.cloudflare.com',
     supabaseOrigin,
   ]
     .filter(Boolean)
@@ -23,7 +24,7 @@ const ContentSecurityPolicy = [
   "media-src 'self'",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
-  "frame-src 'none'",
+  "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
