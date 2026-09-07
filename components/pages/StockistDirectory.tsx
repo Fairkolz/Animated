@@ -2,18 +2,18 @@
 
 import { useMemo, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { stockists, stockistRegions, type StockistRegion } from '../../lib/stockists'
+import { stockistRegions, type StockistRegion, type Stockist } from '../../lib/api'
 import FilterPillBar from '../shared/FilterPillBar'
 
 const EASE: [number, number, number, number] = [0.22, 0.61, 0.36, 1]
 
-export default function StockistDirectory() {
+export default function StockistDirectory({ stockists }: { stockists: Stockist[] }) {
   const prefersReduced = useReducedMotion()
   const [region, setRegion] = useState<'All' | StockistRegion>('All')
 
   const filtered = useMemo(
     () => (region === 'All' ? stockists : stockists.filter((s) => s.region === region)),
-    [region]
+    [region, stockists]
   )
 
   return (

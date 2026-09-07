@@ -10,8 +10,13 @@ import Trust from '../components/Trust'
 import JournalPreview from '../components/JournalPreview'
 import TheInvitation from '../components/TheInvitation'
 import Footer from '../components/Footer'
+import { getProducts } from '../lib/api'
 
-export default function Home() {
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const products = await getProducts()
+
   return (
     <main>
       <Navigation />
@@ -19,7 +24,7 @@ export default function Home() {
       <TheBelief />
       <TheRitual />
       <TheFormulation />
-      <TheCollection />
+      <TheCollection products={products} />
       <Proof />
       <ThePhilosophy />
       <Trust />

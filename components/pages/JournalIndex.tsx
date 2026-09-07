@@ -1,20 +1,22 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { articles, articleCategories, type ArticleCategory } from '../../lib/articles'
+import { articleCategories, type ArticleCategory, type Article } from '../../lib/api'
 import JournalCard from '../shared/JournalCard'
 import FilterPillBar from '../shared/FilterPillBar'
 
 export default function JournalIndex({
   initialCategory,
+  articles,
 }: {
   initialCategory: 'All' | ArticleCategory
+  articles: Article[]
 }) {
   const [category, setCategory] = useState<'All' | ArticleCategory>(initialCategory)
 
   const filtered = useMemo(
     () => (category === 'All' ? articles : articles.filter((a) => a.category === category)),
-    [category]
+    [category, articles]
   )
 
   /* Grid entrance is a pure CSS stagger (.rise-in) — it plays from first

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import '../styles/globals.css'
 import SmoothScroll from '../components/SmoothScroll'
 import BagProvider from '../components/shared/BagProvider'
+import AuthProvider from '../components/shared/AuthProvider'
 
 export const metadata: Metadata = {
   title: 'AUVERER — Luxury Skincare',
@@ -29,7 +30,9 @@ export default function RootLayout({
       </head>
       <body>
         <BagProvider>
-          <SmoothScroll>{children}</SmoothScroll>
+          <AuthProvider>
+            <SmoothScroll>{children}</SmoothScroll>
+          </AuthProvider>
         </BagProvider>
       </body>
     </html>

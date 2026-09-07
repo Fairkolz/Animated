@@ -6,7 +6,7 @@
 import { motion, useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Article } from '../lib/articles'
+import type { Article } from '../lib/api'
 import { articleImage } from '../lib/images'
 
 type FeaturedArticle = Pick<Article, 'slug' | 'title' | 'category' | 'excerpt'>

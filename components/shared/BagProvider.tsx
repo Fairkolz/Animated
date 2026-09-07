@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import type { Product } from '../../lib/products'
+import type { Product } from '../../lib/api'
 
 export type BagItem = {
   slug: string

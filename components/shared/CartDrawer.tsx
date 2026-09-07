@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useBag } from './BagProvider'
-import { formatPrice } from '../../lib/products'
+import { formatPrice } from '../../lib/api'
 import { productImage } from '../../lib/images'
 
 const EASE: [number, number, number, number] = [0.22, 0.61, 0.36, 1]

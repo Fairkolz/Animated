@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Article } from '../../lib/articles'
+import type { Article } from '../../lib/api'
 import { articleImage } from '../../lib/images'
 
 /* Journal card — editorial text card with a 16:9 image placement block.

@@ -5,7 +5,7 @@ import Breadcrumb from '../../components/shared/Breadcrumb'
 import PageHeader from '../../components/shared/PageHeader'
 import ClosingCta from '../../components/shared/ClosingCta'
 import JournalIndex from '../../components/pages/JournalIndex'
-import { articleCategories, type ArticleCategory } from '../../lib/articles'
+import { getArticles, articleCategories, type ArticleCategory } from '../../lib/api'
 
 export const metadata: Metadata = {
   title: 'The Journal — Auvérer',
@@ -13,14 +13,19 @@ export const metadata: Metadata = {
     'Essays on living well: ritual, ingredients, skin science and the quiet discipline of doing less, better.',
 }
 
-export default function JournalPage({
+export const dynamic = 'force-dynamic'
+
+export default async function JournalPage({
   searchParams,
 }: {
-  searchParams?: { category?: string }
+  searchParams?: Promise<{ category?: string }>
 }) {
-  const raw = searchParams?.category
+  const params = await searchParams
+  const raw = params?.category
   const initialCategory: 'All' | ArticleCategory =
     raw && (articleCategories as readonly string[]).includes(raw) ? (raw as ArticleCategory) : 'All'
+
+  const articles = await getArticles()
 
   return (
     <main>
@@ -32,7 +37,7 @@ export default function JournalPage({
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Journal' }]}
       />
 
-      <JournalIndex initialCategory={initialCategory} />
+      <JournalIndex initialCategory={initialCategory} articles={articles} />
 
       <ClosingCta
         title="Reading is research. So is touching your own skin."

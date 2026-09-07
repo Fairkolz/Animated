@@ -8,20 +8,20 @@ import JournalCard from '../../../components/shared/JournalCard'
 import ParallaxImage from '../../../components/shared/ParallaxImage'
 import ScrollReveal from '../../../components/ScrollReveal'
 import ClosingCta from '../../../components/shared/ClosingCta'
-import { articles, getArticle } from '../../../lib/articles'
+import { getArticles, getArticle } from '../../../lib/api'
 import { articleImage } from '../../../lib/images'
 
-export function generateStaticParams() {
-  return articles.map((a) => ({ article: a.slug }))
-}
+export const dynamic = 'force-dynamic'
 
-export function generateMetadata({ params }: { params: { article: string } }): Metadata {
-  const article = getArticle(params.article)
+export async function generateMetadata({ params }: { params: Promise<{ article: string }> }): Promise<Metadata> {
+  const { article: slug } = await params
+  const article = await getArticle(slug)
   if (!article) return { title: 'Not Found — Auvérer' }
   return { title: `${article.title} — The Journal — Auvérer`, description: article.excerpt }
 }
 
-function RelatedReading({ currentSlug }: { currentSlug: string }) {
+async function RelatedReading({ currentSlug }: { currentSlug: string }) {
+  const articles = await getArticles()
   const related = articles.filter((a) => a.slug !== currentSlug).slice(0, 3)
   return (
     <section
@@ -55,8 +55,9 @@ function RelatedReading({ currentSlug }: { currentSlug: string }) {
   )
 }
 
-export default function ArticlePage({ params }: { params: { article: string } }) {
-  const article = getArticle(params.article)
+export default async function ArticlePage({ params }: { params: Promise<{ article: string }> }) {
+  const { article: slug } = await params
+  const article = await getArticle(slug)
   if (!article) notFound()
 
   return (

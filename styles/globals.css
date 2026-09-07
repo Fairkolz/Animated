@@ -359,6 +359,23 @@ a:focus-visible .card-zoom > * {
 .nav-link:hover { color: var(--color-accent-gold) !important; }
 .nav-icon-btn:hover { color: var(--color-accent-gold) !important; }
 
+/* Gold-outline CTA in the top bar. No underline (unlike .nav-link), and on
+   hover it fills gold with a dark label instead of turning all-gold text. */
+.nav-cta:focus-visible {
+  outline: 1px solid var(--color-accent-gold);
+  outline-offset: 3px;
+}
+
+/* Auth drawer — centered single-column dialog. */
+.auth-dialog {
+  width: 100%;
+}
+.auth-form-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 /* Hero chapters — short (landscape phone / small window) viewports */
 /* The hero is a fixed-height pinned scroll section. When the viewport
    height is very short, vertically-centered chapter content is clipped

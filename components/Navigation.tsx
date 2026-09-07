@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
-import { Menu, X, Search, ShoppingBag } from 'lucide-react'
+import { Menu, X, Search, ShoppingBag, User } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useBag } from './shared/BagProvider'
+import { useAuth } from './shared/AuthProvider'
 
 /* Overlays are only needed once the user opens them, and each pulls a weighty
    runtime (full-screen Motion + the product/journal datasets). Lazy-loading
@@ -34,6 +35,7 @@ export default function Navigation() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { itemCount, openBag } = useBag()
+  const { user, status, openAuth } = useAuth()
   const prefersReduced = useReducedMotion()
   const navRef = useRef<HTMLElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -173,6 +175,101 @@ export default function Navigation() {
               gap: '1.25rem',
             }}
           >
+            {status === 'guest' && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  marginRight: '0.5rem',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => openAuth('signin')}
+                  className="nav-link"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.625rem 0.75rem',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '0.675rem',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    fontWeight: 400,
+                    color: 'var(--color-text-inverse)',
+                    transition: 'color 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAuth('register')}
+                  className="nav-cta"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid var(--color-accent-gold)',
+                    cursor: 'pointer',
+                    padding: '0.5rem 1.25rem',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '0.675rem',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    fontWeight: 600,
+                    color: 'var(--color-top-cta, var(--color-text-inverse))',
+                    borderRadius: 0,
+                    transition: 'background-color 0.3s ease, color 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
+                    e.currentTarget.style.color = 'var(--color-brand-primary)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = 'var(--color-top-cta, var(--color-text-inverse))'
+                  }}
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+
+            {status === 'authed' && (
+              <button
+                type="button"
+                aria-label={`Account${user?.email ? `, ${user.email}` : ''}`}
+                aria-haspopup="dialog"
+                onClick={() => openAuth()}
+                className="nav-icon-btn"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0.625rem',
+                  color: 'var(--color-text-inverse)',
+                  transition: 'color 0.3s ease',
+                }}
+              >
+                <User size={17} strokeWidth={1.5} />
+              </button>
+            )}
+
+            {status === 'loading' && (
+              <span
+                aria-hidden="true"
+                style={{
+                  display: 'inline-block',
+                  width: '1px',
+                  height: '1.25rem',
+                  margin: '0 0.5rem',
+                  backgroundColor: 'transparent',
+                }}
+              />
+            )}
             <button
               type="button"
               aria-label="Search"
@@ -341,6 +438,88 @@ export default function Navigation() {
                   gap: '2rem',
                   marginTop: '1.5rem',
                 }}>
+                  {status === 'guest' && (
+                    <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileOpen(false)
+                          openAuth('signin')
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '0.625rem 0',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.75rem',
+                          letterSpacing: '0.2em',
+                          textTransform: 'uppercase',
+                          fontWeight: 500,
+                          color: 'var(--color-text-inverse)',
+                          transition: 'color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileOpen(false)
+                          openAuth('register')
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: '1px solid var(--color-accent-gold)',
+                          cursor: 'pointer',
+                          padding: '0.625rem 1.5rem',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.75rem',
+                          letterSpacing: '0.2em',
+                          textTransform: 'uppercase',
+                          fontWeight: 600,
+                          color: 'var(--color-text-inverse)',
+                          borderRadius: 0,
+                          transition: 'background-color 0.3s ease, color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
+                          e.currentTarget.style.color = 'var(--color-brand-primary)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                          e.currentTarget.style.color = 'var(--color-text-inverse)'
+                        }}
+                      >
+                        Sign Up
+                      </button>
+                    </div>
+                  )}
+                  {status === 'authed' && (
+                    <button
+                      type="button"
+                      aria-label="Account"
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        setMobileOpen(false)
+                        openAuth()
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0.625rem',
+                        color: 'var(--color-text-inverse)',
+                        transition: 'color 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                    >
+                      <User size={22} strokeWidth={1.5} />
+                    </button>
+                  )}
                   <button
                     type="button"
                     aria-label="Search"

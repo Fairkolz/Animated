@@ -4,25 +4,25 @@ import Navigation from '../../../components/Navigation'
 import Footer from '../../../components/Footer'
 import Breadcrumb from '../../../components/shared/Breadcrumb'
 import ProductDetail from '../../../components/pages/ProductDetail'
-import { products, getProduct, getRelatedProducts } from '../../../lib/products'
+import { getProducts, getProduct, getRelatedProducts, formatPrice } from '../../../lib/api'
 
-export function generateStaticParams() {
-  return products.map((p) => ({ product: p.slug }))
-}
+export const dynamic = 'force-dynamic'
 
-export function generateMetadata({ params }: { params: { product: string } }): Metadata {
-  const product = getProduct(params.product)
+export async function generateMetadata({ params }: { params: Promise<{ product: string }> }): Promise<Metadata> {
+  const { product: slug } = await params
+  const product = await getProduct(slug)
   if (!product) return { title: 'Not Found — Auvérer' }
   return {
     title: `${product.name} — Auvérer`,
-    description: `${product.tagline} ${product.size} · $${product.price.toFixed(2)}.`,
+    description: `${product.tagline} ${product.size} · ${formatPrice(product.price)}.`,
   }
 }
 
-export default function ProductPage({ params }: { params: { product: string } }) {
-  const product = getProduct(params.product)
+export default async function ProductPage({ params }: { params: Promise<{ product: string }> }) {
+  const { product: slug } = await params
+  const product = await getProduct(slug)
   if (!product) notFound()
-  const related = getRelatedProducts(product, 3)
+  const related = await getRelatedProducts(product, 3)
 
   return (
     <main>

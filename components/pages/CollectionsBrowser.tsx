@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { products, categories, type ProductCategory } from '../../lib/products'
+import { categories, type ProductCategory, type Product } from '../../lib/api'
 import ProductCard from '../shared/ProductCard'
 import FilterPillBar from '../shared/FilterPillBar'
 
@@ -23,9 +23,11 @@ function ChevronIcon() {
 export default function CollectionsBrowser({
   initialCategory,
   initialSort,
+  products,
 }: {
   initialCategory: 'All' | ProductCategory
   initialSort: SortOption
+  products: Product[]
 }) {
   const prefersReduced = useReducedMotion()
   const [category, setCategory] = useState<'All' | ProductCategory>(initialCategory)
@@ -49,7 +51,7 @@ export default function CollectionsBrowser({
         break
     }
     return list
-  }, [category, sort])
+  }, [category, sort, products])
 
   const visible = filtered.slice(0, visibleCount)
   const hasMore = visibleCount < filtered.length

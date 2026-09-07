@@ -5,6 +5,7 @@ import Breadcrumb from '../../components/shared/Breadcrumb'
 import PageHeader from '../../components/shared/PageHeader'
 import ClosingCta from '../../components/shared/ClosingCta'
 import StockistDirectory from '../../components/pages/StockistDirectory'
+import { getStockists } from '../../lib/api'
 
 export const metadata: Metadata = {
   title: 'Stockists — Auvérer',
@@ -12,7 +13,11 @@ export const metadata: Metadata = {
     'A small, considered network of boutiques in Europe, North America and Asia-Pacific that keep Auvérer on their shelves.',
 }
 
-export default function StockistsPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function StockistsPage() {
+  const stockists = await getStockists()
+
   return (
     <main>
       <Navigation />
@@ -23,7 +28,7 @@ export default function StockistsPage() {
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Stockists' }]}
       />
 
-      <StockistDirectory />
+      <StockistDirectory stockists={stockists} />
 
       <ClosingCta
         title="Prefer to begin at home?"

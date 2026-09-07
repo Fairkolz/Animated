@@ -6,12 +6,28 @@ import { motion, useReducedMotion } from 'motion/react'
 export default function TheInvitation() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'busy' | 'error'>('idle')
   const prefersReduced = useReducedMotion()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setEmail('')
+    setStatus('busy')
+    try {
+      const res = await fetch('/api/subscribers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!res.ok) {
+        setStatus('error')
+        return
+      }
+      setSubmitted(true)
+      setEmail('')
+      setStatus('idle')
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -102,6 +118,7 @@ export default function TheInvitation() {
             </div>
             <button
               type="submit"
+              disabled={status === 'busy'}
               style={{
                 backgroundColor: 'var(--color-accent-gold)',
                 color: 'var(--color-brand-primary)',
@@ -111,16 +128,31 @@ export default function TheInvitation() {
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.2em',
-                cursor: 'pointer',
+                cursor: status === 'busy' ? 'default' : 'pointer',
+                opacity: status === 'busy' ? 0.7 : 1,
                 borderRadius: 0, // Sharp corners
                 transition: 'opacity 0.3s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9' }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
+              onMouseEnter={(e) => { if (status !== 'busy') e.currentTarget.style.opacity = '0.9' }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = status === 'busy' ? '0.7' : '1' }}
             >
-              JOIN THE LIST
+              {status === 'busy' ? 'SUBSCRIBING…' : 'JOIN THE LIST'}
             </button>
           </motion.form>
+        )}
+        {status === 'error' && !submitted && (
+          <p
+            aria-live="polite"
+            style={{
+              marginTop: '1.5rem',
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.75rem',
+              color: 'var(--color-text-secondary)',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Something went wrong. Please try again.
+          </p>
         )}
       </div>
     </section>

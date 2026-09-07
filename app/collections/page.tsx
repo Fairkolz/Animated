@@ -5,7 +5,7 @@ import Breadcrumb from '../../components/shared/Breadcrumb'
 import PageHeader from '../../components/shared/PageHeader'
 import ClosingCta from '../../components/shared/ClosingCta'
 import CollectionsBrowser from '../../components/pages/CollectionsBrowser'
-import { categories, type ProductCategory } from '../../lib/products'
+import { getProducts, categories, type ProductCategory } from '../../lib/api'
 
 export const metadata: Metadata = {
   title: 'The Collection — Auvérer',
@@ -13,23 +13,28 @@ export const metadata: Metadata = {
     'Every Auvérer formulation in one place: cleansers, elixirs, creams, eye and lip care, composed as rituals rather than routines.',
 }
 
+export const dynamic = 'force-dynamic'
+
 type SortOption = 'Featured' | 'Price: Low to High' | 'Price: High to Low' | 'New'
 
 const validSorts: SortOption[] = ['Featured', 'Price: Low to High', 'Price: High to Low', 'New']
 
-export default function CollectionsPage({
+export default async function CollectionsPage({
   searchParams,
 }: {
-  searchParams?: { category?: string; sort?: string }
+  searchParams?: Promise<{ category?: string; sort?: string }>
 }) {
-  const rawCategory = searchParams?.category
+  const params = await searchParams
+  const rawCategory = params?.category
   const category =
     rawCategory && (categories as readonly string[]).includes(rawCategory)
       ? (rawCategory as 'All' | ProductCategory)
       : 'All'
-  const rawSort = searchParams?.sort
+  const rawSort = params?.sort
   const sort: SortOption =
     rawSort === 'new' ? 'New' : validSorts.includes(rawSort as SortOption) ? (rawSort as SortOption) : 'Featured'
+
+  const products = await getProducts()
 
   return (
     <main>
@@ -41,7 +46,7 @@ export default function CollectionsPage({
         crumbs={[{ label: 'Home', href: '/' }, { label: 'Collections' }]}
       />
 
-      <CollectionsBrowser initialCategory={category} initialSort={sort} />
+      <CollectionsBrowser initialCategory={category} initialSort={sort} products={products} />
 
       <ClosingCta
         title="Unsure where to begin?"

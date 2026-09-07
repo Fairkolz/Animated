@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { products as allProducts, formatPrice, type Product } from '../lib/products'
+import { formatPrice, type Product } from '../lib/api'
 import { productImage } from '../lib/images'
 
 const BESTSELLER_SLUGS = [
@@ -16,9 +16,10 @@ const BESTSELLER_SLUGS = [
   'lip-oil',
 ]
 
-const products = BESTSELLER_SLUGS.map(
-  (slug) => allProducts.find((p) => p.slug === slug),
-).filter((p): p is Product => Boolean(p))
+const productsFromProps = (allProducts: Product[]) =>
+  BESTSELLER_SLUGS.map(
+    (slug) => allProducts.find((p) => p.slug === slug),
+  ).filter((p): p is Product => Boolean(p))
 
 const easeStandard: [number, number, number, number] = [0.22, 0.61, 0.36, 1]
 
@@ -70,11 +71,39 @@ function CarouselControl({
   )
 }
 
-export default function TheCollection() {
+export default function TheCollection({ products: allProducts }: { products: Product[] }) {
   const [offset, setOffset] = useState(0)
   const prefersReduced = useReducedMotion()
 
+  const products = productsFromProps(allProducts)
   const n = products.length
+
+  if (n === 0) {
+    return (
+      <section
+        aria-label="The Collection"
+        style={{
+          backgroundColor: 'var(--color-surface-container-low)',
+          padding: 'clamp(6rem, 10vw, 10rem) clamp(1.5rem, 4vw, 4rem)',
+          borderTop: '1px solid var(--color-border-default)',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontWeight: 300,
+            fontSize: '0.9375rem',
+            color: 'var(--color-text-muted)',
+            lineHeight: 1.7,
+          }}
+        >
+          The collection is being prepared — please check back shortly.
+        </p>
+      </section>
+    )
+  }
+
   const maxOffset = Math.max(0, n - 3)
   const clamped = Math.min(Math.max(offset, 0), maxOffset)
   const canPrev = clamped > 0
