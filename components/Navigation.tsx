@@ -435,11 +435,117 @@ export default function Navigation() {
                 ))}
                 <div style={{
                   display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                   gap: '2rem',
+                  width: 'min(21rem, 100%)',
                   marginTop: '1.5rem',
                 }}>
+                  {/* Utility icons — search and bag (plus account when signed in) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '2.75rem' }}>
+                    {status === 'authed' && (
+                      <button
+                        type="button"
+                        aria-label="Account"
+                        aria-haspopup="dialog"
+                        onClick={() => {
+                          setMobileOpen(false)
+                          openAuth()
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '0.625rem',
+                          color: 'var(--color-text-inverse)',
+                          transition: 'color 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                      >
+                        <User size={22} strokeWidth={1.5} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      aria-label="Search"
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        setMobileOpen(false)
+                        setSearchOpen(true)
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0.625rem',
+                        color: 'var(--color-text-inverse)',
+                        transition: 'color 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                    >
+                      <Search size={22} strokeWidth={1.5} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Shopping bag${itemCount > 0 ? `, ${itemCount} item${itemCount === 1 ? '' : 's'}` : ', empty'}`}
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        setMobileOpen(false)
+                        openBag()
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0.625rem',
+                        color: 'var(--color-text-inverse)',
+                        position: 'relative',
+                        transition: 'color 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                    >
+                      <ShoppingBag size={22} strokeWidth={1.5} />
+                      {itemCount > 0 && (
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            position: 'absolute',
+                            top: '-2px',
+                            right: '-2px',
+                            minWidth: '14px',
+                            height: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '0 3px',
+                            borderRadius: 'var(--radius-pill)',
+                            backgroundColor: 'var(--color-accent-gold)',
+                            color: 'var(--color-brand-primary)',
+                            fontFamily: 'var(--font-body)',
+                            fontSize: '0.5625rem',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {itemCount}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Auth actions — separated by a hairline so they read as a
+                      distinct "account" group rather than a cramped icon row. */}
                   {status === 'guest' && (
-                    <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.875rem',
+                      width: '100%',
+                      paddingTop: '1.75rem',
+                      borderTop: '1px solid rgba(246, 243, 237, 0.12)',
+                    }}>
                       <button
                         type="button"
                         onClick={() => {
@@ -447,10 +553,11 @@ export default function Navigation() {
                           openAuth('signin')
                         }}
                         style={{
+                          flex: 1,
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          padding: '0.625rem 0',
+                          padding: '0.75rem 0',
                           fontFamily: 'var(--font-body)',
                           fontSize: '0.75rem',
                           letterSpacing: '0.2em',
@@ -471,10 +578,11 @@ export default function Navigation() {
                           openAuth('register')
                         }}
                         style={{
+                          flex: 1.3,
                           background: 'transparent',
                           border: '1px solid var(--color-accent-gold)',
                           cursor: 'pointer',
-                          padding: '0.625rem 1.5rem',
+                          padding: '0.75rem 1.25rem',
                           fontFamily: 'var(--font-body)',
                           fontSize: '0.75rem',
                           letterSpacing: '0.2em',
@@ -500,93 +608,38 @@ export default function Navigation() {
                   {status === 'authed' && (
                     <button
                       type="button"
-                      aria-label="Account"
                       aria-haspopup="dialog"
                       onClick={() => {
                         setMobileOpen(false)
                         openAuth()
                       }}
                       style={{
-                        background: 'none',
-                        border: 'none',
+                        width: '100%',
+                        background: 'transparent',
+                        border: '1px solid var(--color-accent-gold)',
                         cursor: 'pointer',
-                        padding: '0.625rem',
+                        padding: '0.75rem 1.25rem',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '0.75rem',
+                        letterSpacing: '0.2em',
+                        textTransform: 'uppercase',
+                        fontWeight: 600,
                         color: 'var(--color-text-inverse)',
-                        transition: 'color 0.3s ease',
+                        borderRadius: 0,
+                        transition: 'background-color 0.3s ease, color 0.3s ease',
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--color-accent-gold)'
+                        e.currentTarget.style.color = 'var(--color-brand-primary)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent'
+                        e.currentTarget.style.color = 'var(--color-text-inverse)'
+                      }}
                     >
-                      <User size={22} strokeWidth={1.5} />
+                      View Account
                     </button>
                   )}
-                  <button
-                    type="button"
-                    aria-label="Search"
-                    aria-haspopup="dialog"
-                    onClick={() => {
-                      setMobileOpen(false)
-                      setSearchOpen(true)
-                    }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '0.625rem',
-                      color: 'var(--color-text-inverse)',
-                      transition: 'color 0.3s ease',
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
-                  >
-                    <Search size={22} strokeWidth={1.5} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Shopping bag${itemCount > 0 ? `, ${itemCount} item${itemCount === 1 ? '' : 's'}` : ', empty'}`}
-                    aria-haspopup="dialog"
-                    onClick={() => {
-                      setMobileOpen(false)
-                      openBag()
-                    }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '0.625rem',
-                      color: 'var(--color-text-inverse)',
-                      position: 'relative',
-                      transition: 'color 0.3s ease',
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent-gold)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-inverse)' }}
-                  >
-                    <ShoppingBag size={22} strokeWidth={1.5} />
-                    {itemCount > 0 && (
-                      <span
-                        aria-hidden="true"
-                        style={{
-                          position: 'absolute',
-                          top: '-2px',
-                          right: '-2px',
-                          minWidth: '14px',
-                          height: '14px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '0 3px',
-                          borderRadius: 'var(--radius-pill)',
-                          backgroundColor: 'var(--color-accent-gold)',
-                          color: 'var(--color-brand-primary)',
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.5625rem',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {itemCount}
-                      </span>
-                    )}
-                  </button>
                 </div>
               </motion.div>
             )}
